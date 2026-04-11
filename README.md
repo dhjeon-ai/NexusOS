@@ -6,7 +6,7 @@ It helps new projects start with a durable structure instead of growing into sca
 
 ## What it does
 
-ProjectOS installs a lightweight, node-based project structure built around:
+NexusOS installs a lightweight, node-based project structure built around:
 
 - one clear entry document
 - selective context loading
@@ -26,7 +26,7 @@ That usually leads to:
 - AI agents re-reading too much context
 - project rules living only in team memory
 
-ProjectOS solves that by setting a small but durable operating model from the start.
+NexusOS solves that by setting a small but durable operating model from the start.
 
 ## Two-layer design
 
@@ -55,7 +55,7 @@ It adds rules for:
 - risk exceptions
 - sync checks
 
-ProjectOS is designed so an agent inspects the repository first, then asks the user whether to apply Layer 1 only or Layer 1 plus Layer 2.
+NexusOS is designed so an agent inspects the repository first, then asks the user whether to apply Layer 1 only or Layer 1 plus Layer 2.
 
 ## Repository layout
 
