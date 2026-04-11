@@ -1,0 +1,107 @@
+# ProjectOS Bootstrap Flow
+
+## Goal
+
+Stand up a repository structure that remains understandable after months of feature work.
+
+## Scope gate before bootstrap
+
+Before scaffolding, the agent should inspect the repository and decide which of these two modes fits:
+
+- Layer 1 only
+  - Use when the repository is small, early, or unlikely to need formal multi-session operations yet.
+- Layer 1 plus Layer 2
+  - Use when the repository will benefit from durable task rules, subagent coordination, reporting rules, risk exceptions, and sync checks.
+
+The agent must not choose silently.
+
+After the initial inspection, the agent should ask the user one direct confirmation:
+
+`Do you want ProjectOS core structure only, or core structure plus operating rules?`
+
+Only after that confirmation should the scaffold be applied.
+
+## Phase 1. Pick the root contract
+
+Create one root docs folder.
+
+Recommended default:
+
+```text
+docs/
+  00_Project_Index.md
+  01_Architecture/
+  02_Components/
+  03_Decisions_ADR/
+  04_Archive/
+  Active_Tasks/
+```
+
+Create one root session-status file outside the docs folder:
+
+```text
+project_work_status.md
+```
+
+## Phase 2. Write the first-read index
+
+The index should answer only four things:
+
+- where to start
+- what architecture pages exist
+- what core components exist
+- what active tasks exist
+
+Do not turn the index into a long wiki.
+
+## Phase 3. Lock selective loading rules
+
+Add simple operating rules such as:
+
+- read one root page first
+- open only directly relevant pages
+- avoid broad rereads
+- use active task pages only for medium or large work
+
+## Phase 4. Define component contracts
+
+Create component pages for the modules that most work will touch.
+
+Each page should describe:
+
+- what it does
+- where it lives
+- what goes in and out
+- which rules or risks matter
+
+## Phase 5. Add task continuity
+
+Use active task pages only when the work:
+
+- spans three or more files
+- introduces a new module
+- changes a contract
+- needs handoff continuity
+
+## Phase 6. Add decision records
+
+Create a decision page only when a future reader would ask:
+
+"Why is the system built this way instead of another way?"
+
+## Phase 7. Keep the system healthy
+
+- update component pages when behavior changes
+- archive completed task pages
+- keep session status short and current
+- resist adding duplicate overview files
+
+## Layer 2 expansion
+
+If the user chooses Layer 2, add rule pages for:
+
+- task lifecycle
+- subagent workflow
+- reporting style
+- risk exceptions
+- sync checks

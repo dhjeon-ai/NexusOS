@@ -1,0 +1,4 @@
+version: 1
+display_name: ProjectOS
+short_description: Bootstraps a durable repository operating system with low-context docs and node-based structure.
+default_prompt: Set up ProjectOS for this repository so future work starts from a clear index, selective-loading rules, and stable task/component docs.

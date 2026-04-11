@@ -1,0 +1,43 @@
+module:
+  name: ProjectOS
+  domain: repository-bootstrap
+  provider: local-filesystem
+  intent: Install a durable repository operating system with low-context project structure and node-based documentation contracts.
+
+environment:
+  required: {}
+  optional:
+    PROJECTOS_DOCS_ROOT:
+      description: Override the default docs root created by the bootstrap script.
+    PROJECTOS_CODE_ROOT:
+      description: Hint for the main code directory when the repository uses a nonstandard layout.
+
+service_entry_points:
+  bootstrap_script: scripts/bootstrap_projectos.py
+  skill_entry: SKILL.md
+  node_reference: references/node-model.md
+
+capabilities:
+  - id: scaffold-operating-structure
+    route: scripts/bootstrap_projectos.py
+    method: N/A
+    notes: Creates starter docs, task, component, and decision folders plus the root session-status file.
+  - id: choose-layer-scope
+    route: resources/activation-checklist.md
+    method: N/A
+    notes: Guides the initial repository review and the user confirmation between Layer 1 only or Layer 1 plus Layer 2.
+  - id: define-node-contracts
+    route: references/node-model.md
+    method: N/A
+    notes: Defines the role of index, architecture, component, task, decision, and status nodes.
+  - id: guide-bootstrap-flow
+    route: references/bootstrap-flow.md
+    method: N/A
+    notes: Explains the step order for standing up a new repository structure.
+
+runtime_rules:
+  - The index file should stay short enough to be loaded first on every task.
+  - Project-specific rules should live in scoped pages, not inside the root skill contract.
+  - New tasks should be tracked only when the work is large enough to need continuity.
+  - Session status should capture current progress without replacing durable architecture docs.
+  - The agent must inspect the repository and ask the user to choose Layer 1 only or Layer 1 plus Layer 2 before applying rule-pack documents.
