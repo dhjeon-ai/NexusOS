@@ -1,6 +1,6 @@
 # NexusOS
 
-ProjectOS is a reusable repository operating system for humans and AI agents.
+NexusOS is a reusable repository operating system for humans and AI agents.
 
 It helps new projects start with a durable structure instead of growing into scattered notes, duplicate overviews, and expensive context reloads.
 
