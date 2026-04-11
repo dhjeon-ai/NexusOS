@@ -1,4 +1,4 @@
-# ProjectOS
+# NexusOS
 
 ProjectOS is a reusable repository operating system for humans and AI agents.
 
