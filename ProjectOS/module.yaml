@@ -21,7 +21,15 @@ capabilities:
   - id: scaffold-operating-structure
     route: scripts/bootstrap_projectos.py
     method: N/A
-    notes: Creates starter docs, task, component, and decision folders plus the root session-status file.
+    notes: Creates nexusos.yaml, starter docs, task, component, and decision folders plus the root session-status file.
+  - id: define-repository-contract
+    route: references/repository-contract.md
+    method: N/A
+    notes: Defines the project-specific path, context, profile, and verification contract stored in nexusos.yaml.
+  - id: enforce-minimum-context
+    route: references/minimum-context-policy.md
+    method: N/A
+    notes: Guides agents to read only the minimum relevant context before editing.
   - id: choose-layer-scope
     route: resources/activation-checklist.md
     method: N/A
@@ -36,6 +44,8 @@ capabilities:
     notes: Explains the step order for standing up a new repository structure.
 
 runtime_rules:
+  - The repository root should contain nexusos.yaml with path, context, and verification defaults.
+  - Agents should read nexusos.yaml before assuming repository paths.
   - The index file should stay short enough to be loaded first on every task.
   - Project-specific rules should live in scoped pages, not inside the root skill contract.
   - New tasks should be tracked only when the work is large enough to need continuity.

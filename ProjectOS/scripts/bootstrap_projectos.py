@@ -4,18 +4,55 @@ import argparse
 from pathlib import Path
 
 
+NEXUSOS_CONFIG_TEMPLATE = """# NexusOS repository contract.
+# Agents should read this file first when they need project paths, status files,
+# verification commands, or context-loading limits.
+
+project:
+  name: "{project_name}"
+
+paths:
+  docs_root: "{docs_root}"
+  code_root: "{code_root}"
+  status_file: "{status_file}"
+  index_file: "{docs_root}/00_Project_Index.md"
+
+context:
+  first_read:
+    - "{docs_root}/00_Project_Index.md"
+  default_limit: 3
+  rule: "Read the index first, then open only the directly relevant architecture, component, or task pages."
+
+verification:
+  default_commands: []
+  notes: "Add project-specific test, lint, build, or smoke-check commands here."
+
+profiles:
+  active:
+    - core
+"""
+
+
 INDEX_TEMPLATE = """# {project_name} - Project Index
 
 > Purpose: single entry point for project context loading.
-> Read this file first, then open only the 1 to 3 pages directly related to the task.
+> Read this file first, then open only the pages directly related to the task.
 
 ---
 
 ## How to Use This Index
 
-1. Start here.
-2. Open only the relevant architecture or component pages.
-3. Create an active task page only for work large enough to need continuity.
+1. Read `../nexusos.yaml` for repository paths and context limits.
+2. Start here.
+3. Open only the relevant architecture, component, or active task pages.
+4. Create an active task page only for work large enough to need continuity.
+
+## Minimum Context Policy
+
+- Open this index before any broader repository reading.
+- By default, open no more than 3 additional context pages before editing.
+- Prefer targeted search and small file ranges over full repository scans.
+- Read deeper only for security, data-loss risk, path contracts, or state-transition logic.
 
 ---
 
@@ -116,12 +153,26 @@ def main() -> None:
     parser.add_argument("--project-name", required=True, help="Project display name")
     parser.add_argument("--docs-root", default="docs", help="Docs root folder relative to the repository root")
     parser.add_argument("--code-root", default="src", help="Primary code root relative to the repository root")
+    parser.add_argument(
+        "--status-file",
+        default="project_work_status.md",
+        help="Session status file relative to the repository root",
+    )
     args = parser.parse_args()
 
     root = Path(args.root).resolve()
     docs_root = root / args.docs_root
     created = "YYYY-MM-DD"
 
+    write_if_missing(
+        root / "nexusos.yaml",
+        NEXUSOS_CONFIG_TEMPLATE.format(
+            project_name=args.project_name,
+            docs_root=args.docs_root,
+            code_root=args.code_root,
+            status_file=args.status_file,
+        ),
+    )
     write_if_missing(
         docs_root / "00_Project_Index.md",
         INDEX_TEMPLATE.format(project_name=args.project_name),
@@ -143,7 +194,7 @@ def main() -> None:
         TASK_TEMPLATE.format(created=created),
     )
     write_if_missing(
-        root / "project_work_status.md",
+        root / args.status_file,
         STATUS_TEMPLATE.format(created=created),
     )
 

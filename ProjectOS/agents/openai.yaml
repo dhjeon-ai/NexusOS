@@ -1,4 +1,4 @@
 version: 1
-display_name: ProjectOS
-short_description: Bootstraps a durable repository operating system with low-context docs and node-based structure.
-default_prompt: Set up ProjectOS for this repository so future work starts from a clear index, selective-loading rules, and stable task/component docs.
+display_name: NexusOS Bootstrap
+short_description: Bootstraps a durable agent work standard with repository contracts and low-context docs.
+default_prompt: Set up NexusOS for this repository so agents share the same paths, context-loading rules, task flow, and verification defaults.

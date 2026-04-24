@@ -23,11 +23,22 @@ Only after that confirmation should the scaffold be applied.
 
 ## Phase 1. Pick the root contract
 
-Create one root docs folder.
+Create one root `nexusos.yaml` file and one root docs folder.
+
+The repository contract stores the project-specific defaults that agents should not guess:
+
+- project name
+- docs root
+- code root
+- status file
+- index file
+- context-loading limit
+- verification commands
 
 Recommended default:
 
 ```text
+nexusos.yaml
 docs/
   00_Project_Index.md
   01_Architecture/
@@ -54,12 +65,16 @@ The index should answer only four things:
 
 Do not turn the index into a long wiki.
 
+The index should point agents back to `nexusos.yaml` for paths, context limits, and verification commands.
+
 ## Phase 3. Lock selective loading rules
 
 Add simple operating rules such as:
 
+- read `nexusos.yaml` before assuming repository paths
 - read one root page first
 - open only directly relevant pages
+- use the configured context limit before editing
 - avoid broad rereads
 - use active task pages only for medium or large work
 

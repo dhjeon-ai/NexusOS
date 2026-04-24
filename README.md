@@ -9,6 +9,7 @@ It helps new projects start with a durable structure instead of growing into sca
 NexusOS installs a lightweight, node-based project structure built around:
 
 - one clear entry document
+- one repository contract file
 - selective context loading
 - stable architecture and component contracts
 - task continuity for medium and large work
@@ -37,6 +38,7 @@ Use Layer 1 when you want a clean, low-cost project foundation.
 It creates:
 
 - a project index
+- a root `nexusos.yaml` repository contract
 - architecture pages
 - component pages
 - active task pages
@@ -67,7 +69,9 @@ ProjectOS/
     openai.yaml
   references/
     bootstrap-flow.md
+    minimum-context-policy.md
     node-model.md
+    repository-contract.md
     reporting-style.md
     risk-exceptions.md
     subagent-workflow.md
@@ -94,6 +98,7 @@ This creates a starter operating structure such as:
 
 ```text
 my-repo/
+  nexusos.yaml
   docs/
     00_Project_Index.md
     01_Architecture/
@@ -106,11 +111,12 @@ my-repo/
 
 ## How agents should use it
 
-1. Read the minimum repository surface.
-2. Review `resources/activation-checklist.md`.
-3. Decide whether the repository likely needs only Layer 1 or both layers.
-4. Ask the user to confirm one choice.
-5. Apply only the confirmed scope.
+1. Read `nexusos.yaml` for project paths, context limits, and verification defaults.
+2. Read the minimum repository surface.
+3. Review `resources/activation-checklist.md`.
+4. Decide whether the repository likely needs only Layer 1 or both layers.
+5. Ask the user to confirm one choice.
+6. Apply only the confirmed scope.
 
 ## Design principles
 
@@ -127,6 +133,8 @@ ProjectOS is a reusable bootstrap package under active refinement.
 The current version already supports:
 
 - core repository scaffolding
+- root `nexusos.yaml` repository contracts
+- minimum-context loading rules
 - node-based documentation roles
 - layered operating-rule design
 - user-confirmed scope selection before expansion
