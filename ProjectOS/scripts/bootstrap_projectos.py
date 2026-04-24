@@ -34,6 +34,7 @@ verification:
 profiles:
   active:
     - core
+{layer_profile}
 """
 
 
@@ -140,6 +141,7 @@ INDEX_TEMPLATE = """# {project_name} - Project Index
 | [[Agent_Rules/verification-matrix]] | Minimum verification by change type |
 | [[Agent_Rules/decision-gates]] | User confirmation gates for high-risk work |
 | [[Agent_Rules/handoff-packet]] | Session and task handoff format |
+{operating_rule_rows}
 
 ## Core Components
 
@@ -245,6 +247,7 @@ Bring this existing repository under the NexusOS operating standard without over
 - Agent rules file: `{agents_file}`
 - Status file: `{status_file}`
 - Verification commands: {verification_summary}
+- Layer: `{layer}`
 
 ## Files Created
 
@@ -254,9 +257,110 @@ Bring this existing repository under the NexusOS operating standard without over
 
 {preserved_files}
 
+## Agent Rules Reconciliation
+
+{agent_rules_reconciliation}
+
+## Documentation Entrypoint Reconciliation
+
+{documentation_reconciliation}
+
+## Verification Command Confirmation
+
+{verification_confirmation}
+
+## Component Draft Review
+
+Generated component pages are drafts. Review each page under `{docs_root}/02_Components/` before treating it as source of truth.
+
+{component_review_items}
+
+## Layer Scope Follow-up
+
+{layer_follow_up}
+
 ## Next Action
 
-Review generated component drafts and fill in project-specific verification commands if needed.
+Choose the next reconciliation step above before treating the adoption as complete.
+"""
+
+
+TASK_LIFECYCLE_TEMPLATE = """# Task Lifecycle
+
+Use active task pages for medium or large work that needs continuity.
+
+## Start
+
+- Define the goal.
+- List touched components.
+- Record acceptance criteria and verification plan.
+
+## Execute
+
+- Keep notes short and current.
+- Update component pages only when behavior or contracts change.
+
+## Close
+
+- Record completed work.
+- Record verification.
+- Move finished task pages to the archive when the project is ready.
+"""
+
+
+SUBAGENT_WORKFLOW_TEMPLATE = """# Subagent Workflow
+
+Use role splitting only when the task is large enough to benefit from parallel work.
+
+## Default roles
+
+- Orchestrator: owns plan, sequencing, and final integration.
+- Implementer: makes scoped changes.
+- Reviewer: checks regressions and missing validation.
+- Operator: validates runtime, logs, and environment behavior when needed.
+
+## Rule
+
+Delegated work is not complete until the orchestrator verifies the integrated result.
+"""
+
+
+REPORTING_STYLE_TEMPLATE = """# Reporting Style
+
+Report work in this order:
+
+1. What changed
+2. Why it changed
+3. How it affects the user
+4. What remains
+
+When blocked, explain why it is blocked and present the available options.
+"""
+
+
+RISK_EXCEPTIONS_TEMPLATE = """# Risk Exceptions
+
+Read more deeply and ask for confirmation when work involves:
+
+- security, credentials, authentication, or permissions
+- data deletion, migration, or overwrite risk
+- public APIs, file formats, or path contracts
+- state transitions, queues, retries, or scheduling
+- production deployment or package publishing
+"""
+
+
+SYNC_CHECKS_TEMPLATE = """# Sync Checks
+
+Use this page to track project-specific checks that keep generated rules and repository behavior aligned.
+
+## Default rule
+
+When code behavior changes a documented contract, update the matching component or architecture page.
+
+## Project-specific checks
+
+- Add checks here as the project matures.
 """
 
 
@@ -436,10 +540,97 @@ def format_component_rows(component_names: list[str], source_paths: list[str]) -
     return "\n".join(rows)
 
 
+def format_operating_rule_rows(layer: str) -> str:
+    if layer != "full":
+        return ""
+    return "\n".join(
+        [
+            "| [[Agent_Rules/task-lifecycle]] | Task lifecycle for medium and large work |",
+            "| [[Agent_Rules/subagent-workflow]] | Role split and delegated-work review rules |",
+            "| [[Agent_Rules/reporting-style]] | User-facing reporting order |",
+            "| [[Agent_Rules/risk-exceptions]] | Higher-risk work that needs deeper reading or confirmation |",
+            "| [[Agent_Rules/sync-checks]] | Keeping code behavior and docs aligned |",
+        ]
+    )
+
+
 def format_adoption_summary(items: list[str]) -> str:
     if not items:
         return "- None"
     return "\n".join(f"- `{item}`" for item in items)
+
+
+def format_agent_reconciliation(original_agents_file: str, generated_agents_file: str) -> str:
+    if original_agents_file == generated_agents_file:
+        return (
+            f"`{generated_agents_file}` is the active agent rules file. "
+            "No separate reconciliation is needed unless the project already uses another agent guide."
+        )
+    return f"""Existing `{original_agents_file}` was preserved.
+NexusOS rules were written to `{generated_agents_file}`.
+
+Choose one next step:
+
+1. Safest: keep both files and add a short reference from `{original_agents_file}` to `{generated_agents_file}`.
+2. Cleanest: merge both files into one `{original_agents_file}` after review, then update `nexusos.yaml` to point to `{original_agents_file}`.
+3. Temporary: keep `nexusos.yaml` pointing to `{generated_agents_file}` until the team reviews both files.
+"""
+
+
+def format_documentation_reconciliation(root: Path, docs_root_name: str) -> str:
+    candidates = [
+        "README.md",
+        "docs/README.md",
+        "wiki/README.md",
+        "documentation/README.md",
+        f"{docs_root_name}/00_Project_Index.md",
+    ]
+    existing = [candidate for candidate in candidates if (root / candidate).exists()]
+    existing_lines = format_adoption_summary(existing)
+    return f"""Detected possible entry documents:
+
+{existing_lines}
+
+Choose one canonical operating entrypoint for agents. Recommended default: `{docs_root_name}/00_Project_Index.md`.
+Keep README files for external or human introduction unless the project owner chooses otherwise.
+"""
+
+
+def format_verification_confirmation(commands: list[str]) -> str:
+    if not commands:
+        return (
+            "No verification command was detected. Add the project-specific test, lint, build, "
+            "or smoke-check command to `nexusos.yaml` before relying on automated verification."
+        )
+    command_lines = format_adoption_summary(commands)
+    return f"""Detected verification commands:
+
+{command_lines}
+
+Confirm these commands before treating them as project defaults. If they are wrong, update `nexusos.yaml`.
+"""
+
+
+def format_component_review_items(component_names: list[str]) -> str:
+    return "\n".join(f"- Review `02_Components/{name}.md`." for name in component_names)
+
+
+def format_layer_profile(layer: str) -> str:
+    if layer != "full":
+        return ""
+    return "    - operating-rules"
+
+
+def format_layer_follow_up(layer: str, docs_root_name: str) -> str:
+    if layer == "full":
+        return (
+            f"Layer `full` was selected. Review `{docs_root_name}/Agent_Rules/` and "
+            "confirm the generated operating-rule pages fit the project."
+        )
+    return (
+        "Layer `core` was selected. If the project needs stronger task lifecycle, "
+        "subagent, reporting, risk, or sync rules later, rerun with `--layer full` or add those pages manually."
+    )
 
 
 def main() -> None:
@@ -451,6 +642,12 @@ def main() -> None:
         choices=["init", "adopt"],
         default="init",
         help="init creates a starter structure; adopt safely adds NexusOS to an existing repository",
+    )
+    parser.add_argument(
+        "--layer",
+        choices=["core", "full"],
+        default="core",
+        help="core installs the base work standard; full also installs operating-rule pages",
     )
     parser.add_argument("--docs-root", default=None, help="Docs root folder relative to the repository root")
     parser.add_argument("--code-root", default=None, help="Primary code root relative to the repository root")
@@ -489,6 +686,7 @@ def main() -> None:
         if args.mode == "adopt"
         else "| [[02_Components/Main_Component]] | `<fill-me>` | Primary module or service |"
     )
+    operating_rule_rows = format_operating_rule_rows(args.layer)
     adoption_task_row = "| [[Active_Tasks/Task_NexusOS_Adoption]] | Ready |" if args.mode == "adopt" else ""
 
     write_tracked(
@@ -501,6 +699,7 @@ def main() -> None:
             status_file=args.status_file,
             verification_commands=format_yaml_list(verification_commands),
             verification_notes=verification_notes,
+            layer_profile=format_layer_profile(args.layer),
         ),
         root,
         result,
@@ -521,6 +720,7 @@ def main() -> None:
         INDEX_TEMPLATE.format(
             project_name=args.project_name,
             component_rows=component_rows,
+            operating_rule_rows=operating_rule_rows,
             adoption_task_row=adoption_task_row,
         ),
         root,
@@ -592,6 +792,37 @@ def main() -> None:
         root,
         result,
     )
+    if args.layer == "full":
+        write_tracked(
+            docs_root / "Agent_Rules" / "task-lifecycle.md",
+            TASK_LIFECYCLE_TEMPLATE,
+            root,
+            result,
+        )
+        write_tracked(
+            docs_root / "Agent_Rules" / "subagent-workflow.md",
+            SUBAGENT_WORKFLOW_TEMPLATE,
+            root,
+            result,
+        )
+        write_tracked(
+            docs_root / "Agent_Rules" / "reporting-style.md",
+            REPORTING_STYLE_TEMPLATE,
+            root,
+            result,
+        )
+        write_tracked(
+            docs_root / "Agent_Rules" / "risk-exceptions.md",
+            RISK_EXCEPTIONS_TEMPLATE,
+            root,
+            result,
+        )
+        write_tracked(
+            docs_root / "Agent_Rules" / "sync-checks.md",
+            SYNC_CHECKS_TEMPLATE,
+            root,
+            result,
+        )
     if args.mode == "adopt":
         write_tracked(
             docs_root / "Active_Tasks" / "Task_NexusOS_Adoption.md",
@@ -602,8 +833,14 @@ def main() -> None:
                 agents_file=agents_file_name,
                 status_file=args.status_file,
                 verification_summary=", ".join(verification_commands) if verification_commands else "None detected",
+                layer=args.layer,
                 created_files=format_adoption_summary(result.created),
                 preserved_files=format_adoption_summary(result.preserved),
+                agent_rules_reconciliation=format_agent_reconciliation(args.agents_file, agents_file_name),
+                documentation_reconciliation=format_documentation_reconciliation(root, docs_root_name),
+                verification_confirmation=format_verification_confirmation(verification_commands),
+                component_review_items=format_component_review_items(component_names),
+                layer_follow_up=format_layer_follow_up(args.layer, docs_root_name),
             ),
             root,
             result,

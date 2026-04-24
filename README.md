@@ -104,14 +104,16 @@ The skill can either initialize a new repository or safely adopt an existing rep
 Bootstrap a new repository:
 
 ```bash
-python ProjectOS/scripts/bootstrap_projectos.py --root /path/to/my-new-repo --project-name "My New Repo" --mode init
+python ProjectOS/scripts/bootstrap_projectos.py --root /path/to/my-new-repo --project-name "My New Repo" --mode init --layer core
 ```
 
 Adopt an existing repository without overwriting current files:
 
 ```bash
-python ProjectOS/scripts/bootstrap_projectos.py --root /path/to/existing-repo --project-name "Existing Repo" --mode adopt
+python ProjectOS/scripts/bootstrap_projectos.py --root /path/to/existing-repo --project-name "Existing Repo" --mode adopt --layer core
 ```
+
+Use `--layer full` when the project also needs task lifecycle, subagent workflow, reporting style, risk exception, and sync check pages.
 
 This creates a starter operating structure such as:
 
@@ -135,6 +137,7 @@ my-repo/
 ```
 
 In adopt mode, NexusOS detects likely docs and code roots, creates component drafts for detected code areas, detects basic verification commands, and writes an adoption task report under `docs/Active_Tasks/`.
+The adoption report guides the next agent through agent-rule reconciliation, documentation entrypoint reconciliation, verification command confirmation, component draft review, and layer follow-up.
 
 If an existing `AGENTS.md` is present, NexusOS preserves it and writes `AGENTS.nexusos.md` instead.
 
@@ -168,6 +171,8 @@ The current version already supports:
 - root `AGENTS.md` agent operating guides
 - minimum-context loading rules
 - task sizing, verification matrix, decision gate, and handoff packet rules
+- optional `--layer full` operating-rule pages
+- adoption reconciliation guidance for existing repositories
 - node-based documentation roles
 - layered operating-rule design
 - user-confirmed scope selection before expansion

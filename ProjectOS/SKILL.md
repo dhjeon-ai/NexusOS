@@ -40,20 +40,24 @@ Create a project operating system with two expandable layers:
 6. Choose the script mode:
    - Use `--mode init` for a new or empty repository.
    - Use `--mode adopt` for an existing repository that already has source files, docs, or agent rules.
-7. Run `scripts/bootstrap_projectos.py --root <PROJECT_ROOT> --project-name <NAME> --mode <init|adopt>` after the user confirms the scope. Add `--docs-root`, `--code-root`, `--agents-file`, or `--status-file` when the repository already has preferred names.
-8. If the user chooses Layer 2, also read:
+7. Choose the layer:
+   - Use `--layer core` for the base repository contract, AGENTS file, wiki/docs structure, and work harness.
+   - Use `--layer full` when the user also wants task lifecycle, subagent, reporting, risk, and sync rule pages.
+8. Run `scripts/bootstrap_projectos.py --root <PROJECT_ROOT> --project-name <NAME> --mode <init|adopt> --layer <core|full>` after the user confirms the scope. Add `--docs-root`, `--code-root`, `--agents-file`, or `--status-file` when the repository already has preferred names.
+9. If the user chooses Layer 2 / `--layer full`, also read:
    - `references/task-lifecycle.md`
    - `references/subagent-workflow.md`
    - `references/reporting-style.md`
    - `references/risk-exceptions.md`
    - `references/sync-checks.md`
-9. Customize the generated index, component pages, and rule pages for the target repository.
-10. Verify the result with `resources/checklist.md`.
+10. Customize the generated index, component pages, and rule pages for the target repository.
+11. Verify the result with `resources/checklist.md`.
 
 ## Capability map
 
 - Bootstrap docs and operating folders: `scripts/bootstrap_projectos.py`
 - Adopt existing repositories safely: `scripts/bootstrap_projectos.py --mode adopt`
+- Install Layer 2 operating rules: `scripts/bootstrap_projectos.py --layer full`
 - Define project-specific paths and agent defaults: generated `nexusos.yaml`
 - Install first-read agent rules: generated `AGENTS.md`
 - Install work harness rules: generated `docs/Agent_Rules/`
@@ -75,6 +79,7 @@ Create a project operating system with two expandable layers:
 - Prefer durable contracts over long narrative notes.
 - Do not apply Layer 2 rules automatically. Inspect first, then ask the user to choose whether Layer 2 is needed.
 - In adopt mode, preserve existing files. If the requested `AGENTS.md` already exists, generate `AGENTS.nexusos.md` and point `nexusos.yaml` to it.
+- After adopt mode, guide the user through agent-rule reconciliation, documentation entrypoint reconciliation, verification command confirmation, and component draft review before treating adoption as complete.
 
 ## How to execute
 

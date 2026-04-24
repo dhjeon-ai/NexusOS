@@ -28,8 +28,10 @@ python ProjectOS/scripts/bootstrap_projectos.py --root /path/to/new-repo --proje
 Existing repository:
 
 ```bash
-python ProjectOS/scripts/bootstrap_projectos.py --root /path/to/existing-repo --project-name "Project Name" --mode adopt
+python ProjectOS/scripts/bootstrap_projectos.py --root /path/to/existing-repo --project-name "Project Name" --mode adopt --layer core
 ```
+
+Use `--layer full` when the user also wants task lifecycle, subagent workflow, reporting style, risk exception, and sync check pages.
 
 ## Agent Behavior
 
@@ -37,4 +39,4 @@ python ProjectOS/scripts/bootstrap_projectos.py --root /path/to/existing-repo --
 2. Use `--mode adopt` when the target repository already has code, docs, README files, or agent rules.
 3. Preserve existing files. Do not overwrite project-specific rules.
 4. After applying NexusOS, report created files, preserved files, detected structure, and remaining user decisions.
-
+5. In adopt mode, guide the user through agent-rule reconciliation, documentation entrypoint reconciliation, verification command confirmation, and component draft review.

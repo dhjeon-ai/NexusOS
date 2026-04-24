@@ -11,10 +11,11 @@
 - `Agent_Rules/` contains task sizing, verification matrix, decision gates, and handoff packet rules.
 - In adopt mode, existing files were preserved and conflicts were handled with NexusOS-specific candidate files.
 - In adopt mode, an adoption task report lists created files, preserved files, detected structure, and next action.
+- In adopt mode, the adoption task report guides agent-rule reconciliation, documentation entrypoint reconciliation, verification command confirmation, and component draft review.
 - Architecture, component, task, and decision folders exist.
 - The session-status file exists at the repository root.
 - Selective-loading rules are written down.
 - At least the main components have contract pages.
 - Active task pages are used only for work large enough to need continuity.
-- If Layer 2 was chosen, operating-rule pages exist for task lifecycle, subagent workflow, reporting style, risk exceptions, and sync checks.
+- If Layer 2 / `--layer full` was chosen, operating-rule pages exist for task lifecycle, subagent workflow, reporting style, risk exceptions, and sync checks.
 - The structure can be explained without repository-specific tribal knowledge.

@@ -27,6 +27,10 @@ Use `--mode init` when the target repository is new or mostly empty.
 
 Use `--mode adopt` when the target repository already has code, docs, README files, or agent rule files. Adopt mode must preserve existing files and add only missing NexusOS structure.
 
+Use `--layer core` for the base operating standard.
+
+Use `--layer full` when the user also wants task lifecycle, subagent workflow, reporting style, risk exception, and sync check pages.
+
 ## Phase 1. Pick the root contract
 
 Create one root `nexusos.yaml` file and one root docs folder.
@@ -112,6 +116,7 @@ When using adopt mode:
 - preserve existing files
 - create `AGENTS.nexusos.md` when `AGENTS.md` already exists
 - create `Task_NexusOS_Adoption.md` with created files, preserved files, and next actions
+- guide the next agent through agent-rule reconciliation, documentation entrypoint reconciliation, verification command confirmation, component draft review, and layer follow-up
 
 ## Phase 4. Define component contracts
 
@@ -148,7 +153,7 @@ Create a decision page only when a future reader would ask:
 
 ## Layer 2 expansion
 
-If the user chooses Layer 2, add rule pages for:
+If the user chooses Layer 2, run with `--layer full` to add rule pages for:
 
 - task lifecycle
 - subagent workflow
