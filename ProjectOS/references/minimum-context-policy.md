@@ -7,9 +7,10 @@ The minimum context policy keeps agents from rereading too much of a repository 
 ## Default reading order
 
 1. Read `nexusos.yaml`.
-2. Read the index listed in `paths.index_file`.
-3. Open only the directly relevant architecture, component, or active task pages.
-4. Search code with targeted commands before opening full files.
+2. Read the agent rules file listed in `paths.agents_file`.
+3. Read the index listed in `paths.index_file`.
+4. Open only the directly relevant architecture, component, active task, or agent rule pages.
+5. Search code with targeted commands before opening full files.
 
 ## Default limit
 

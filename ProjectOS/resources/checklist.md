@@ -3,10 +3,12 @@
 - The repository was inspected before scaffolding.
 - The user confirmed whether to apply Layer 1 only or Layer 1 plus Layer 2.
 - `nexusos.yaml` exists at the repository root.
-- `nexusos.yaml` records the docs root, code root, status file, index file, and context-loading limit.
+- `nexusos.yaml` records the agent rules file, docs root, code root, status file, index file, agent rules root, and context-loading limit.
+- `AGENTS.md` exists at the repository root or at the configured agent rules path.
 - The repository has one clear index page.
 - The index page tells a new reader what to open first.
 - The index page points agents to `nexusos.yaml` before broader context loading.
+- `Agent_Rules/` contains task sizing, verification matrix, decision gates, and handoff packet rules.
 - Architecture, component, task, and decision folders exist.
 - The session-status file exists at the repository root.
 - Selective-loading rules are written down.

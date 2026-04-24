@@ -10,7 +10,9 @@ NexusOS installs a lightweight, node-based project structure built around:
 
 - one clear entry document
 - one repository contract file
+- one first-read agent rules file
 - selective context loading
+- task sizing, verification, decision, and handoff rules
 - stable architecture and component contracts
 - task continuity for medium and large work
 - optional operating-rule packs for long-lived projects
@@ -39,9 +41,11 @@ It creates:
 
 - a project index
 - a root `nexusos.yaml` repository contract
+- a root `AGENTS.md` operating guide
 - architecture pages
 - component pages
 - active task pages
+- agent rule pages
 - decision record folders
 - a root session-status file
 
@@ -68,6 +72,7 @@ ProjectOS/
   agents/
     openai.yaml
   references/
+    agent-work-harness.md
     bootstrap-flow.md
     minimum-context-policy.md
     node-model.md
@@ -99,6 +104,7 @@ This creates a starter operating structure such as:
 ```text
 my-repo/
   nexusos.yaml
+  AGENTS.md
   docs/
     00_Project_Index.md
     01_Architecture/
@@ -106,17 +112,23 @@ my-repo/
     03_Decisions_ADR/
     04_Archive/
     Active_Tasks/
+    Agent_Rules/
+      task-sizing.md
+      verification-matrix.md
+      decision-gates.md
+      handoff-packet.md
   project_work_status.md
 ```
 
 ## How agents should use it
 
 1. Read `nexusos.yaml` for project paths, context limits, and verification defaults.
-2. Read the minimum repository surface.
-3. Review `resources/activation-checklist.md`.
-4. Decide whether the repository likely needs only Layer 1 or both layers.
-5. Ask the user to confirm one choice.
-6. Apply only the confirmed scope.
+2. Read `AGENTS.md` for the shared work rules.
+3. Read the minimum repository surface.
+4. Review `resources/activation-checklist.md`.
+5. Decide whether the repository likely needs only Layer 1 or both layers.
+6. Ask the user to confirm one choice.
+7. Apply only the confirmed scope.
 
 ## Design principles
 
@@ -134,7 +146,9 @@ The current version already supports:
 
 - core repository scaffolding
 - root `nexusos.yaml` repository contracts
+- root `AGENTS.md` agent operating guides
 - minimum-context loading rules
+- task sizing, verification matrix, decision gate, and handoff packet rules
 - node-based documentation roles
 - layered operating-rule design
 - user-confirmed scope selection before expansion

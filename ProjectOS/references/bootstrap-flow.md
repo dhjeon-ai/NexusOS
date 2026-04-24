@@ -28,10 +28,12 @@ Create one root `nexusos.yaml` file and one root docs folder.
 The repository contract stores the project-specific defaults that agents should not guess:
 
 - project name
+- agent rules file
 - docs root
 - code root
 - status file
 - index file
+- agent rules root
 - context-loading limit
 - verification commands
 
@@ -39,6 +41,7 @@ Recommended default:
 
 ```text
 nexusos.yaml
+AGENTS.md
 docs/
   00_Project_Index.md
   01_Architecture/
@@ -46,6 +49,7 @@ docs/
   03_Decisions_ADR/
   04_Archive/
   Active_Tasks/
+  Agent_Rules/
 ```
 
 Create one root session-status file outside the docs folder:
@@ -65,18 +69,30 @@ The index should answer only four things:
 
 Do not turn the index into a long wiki.
 
-The index should point agents back to `nexusos.yaml` for paths, context limits, and verification commands.
+The index should point agents back to `nexusos.yaml` for paths, context limits, verification commands, and agent rules.
 
 ## Phase 3. Lock selective loading rules
 
 Add simple operating rules such as:
 
 - read `nexusos.yaml` before assuming repository paths
+- read `AGENTS.md` before starting implementation
 - read one root page first
 - open only directly relevant pages
 - use the configured context limit before editing
 - avoid broad rereads
 - use active task pages only for medium or large work
+
+## Phase 3b. Install the work harness
+
+Create a small agent rule set:
+
+- task sizing
+- verification matrix
+- decision gates
+- handoff packet
+
+These files define how agents decide work size, prove completion, stop for human decisions, and preserve continuity.
 
 ## Phase 4. Define component contracts
 

@@ -11,6 +11,8 @@ environment:
       description: Override the default docs root created by the bootstrap script.
     PROJECTOS_CODE_ROOT:
       description: Hint for the main code directory when the repository uses a nonstandard layout.
+    PROJECTOS_AGENTS_FILE:
+      description: Override the default root agent rules file created by the bootstrap script.
 
 service_entry_points:
   bootstrap_script: scripts/bootstrap_projectos.py
@@ -21,7 +23,7 @@ capabilities:
   - id: scaffold-operating-structure
     route: scripts/bootstrap_projectos.py
     method: N/A
-    notes: Creates nexusos.yaml, starter docs, task, component, and decision folders plus the root session-status file.
+    notes: Creates nexusos.yaml, AGENTS.md, starter docs, task, component, decision, and agent-rule folders plus the root session-status file.
   - id: define-repository-contract
     route: references/repository-contract.md
     method: N/A
@@ -30,6 +32,10 @@ capabilities:
     route: references/minimum-context-policy.md
     method: N/A
     notes: Guides agents to read only the minimum relevant context before editing.
+  - id: install-agent-work-harness
+    route: references/agent-work-harness.md
+    method: N/A
+    notes: Defines AGENTS.md plus task sizing, verification, decision gate, and handoff rules.
   - id: choose-layer-scope
     route: resources/activation-checklist.md
     method: N/A
@@ -46,6 +52,7 @@ capabilities:
 runtime_rules:
   - The repository root should contain nexusos.yaml with path, context, and verification defaults.
   - Agents should read nexusos.yaml before assuming repository paths.
+  - The repository root should contain AGENTS.md or the configured equivalent agent rules file.
   - The index file should stay short enough to be loaded first on every task.
   - Project-specific rules should live in scoped pages, not inside the root skill contract.
   - New tasks should be tracked only when the work is large enough to need continuity.
