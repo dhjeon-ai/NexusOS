@@ -66,6 +66,7 @@ Create a project operating system with two expandable layers:
 - Install work harness rules: generated `docs/Agent_Rules/`
 - Install lessons and skill-candidate memory files: generated `docs/Agent_Rules/lessons.md` and `docs/Agent_Rules/skill-candidates.md`
 - Install optional local runtime shim: `scripts/nexusos_runtime.py`, `scripts/check_nexusos.py`, `.nexusos/runtime/`, `.githooks/pre-commit`
+- Install security audit and quarantine workflow: `docs/Agent_Rules/security-audit.md`, `scripts/nexusos_audit.py`, `.nexusos/audit/`, `.nexusos/quarantine/`
 - Define node roles and relationships: `references/node-model.md`
 - Apply onboarding and selective-loading workflow: `references/bootstrap-flow.md`
 - Apply minimum context loading: `references/minimum-context-policy.md`
@@ -86,6 +87,7 @@ Create a project operating system with two expandable layers:
 - In adopt mode, preserve existing files. If the requested `AGENTS.md` already exists, generate `AGENTS.nexusos.md` and point `nexusos.yaml` to it.
 - After adopt mode, guide the user through agent-rule reconciliation, documentation entrypoint reconciliation, verification command confirmation, and component draft review before treating adoption as complete.
 - When the user corrects the agent, update `lessons.md`. When a repeatable workflow emerges, update `skill-candidates.md`.
+- Before applying external rules, skills, scripts, or agent packs, run the audit workflow and quarantine risky files until the user approves.
 
 ## How to execute
 

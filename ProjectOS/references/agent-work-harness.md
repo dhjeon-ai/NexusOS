@@ -12,6 +12,7 @@ The bootstrap script installs these files under `docs/Agent_Rules/` by default:
 - `handoff-packet.md`
 - `lessons.md`
 - `skill-candidates.md`
+- `security-audit.md`
 
 It also installs `AGENTS.md` at the repository root.
 
@@ -26,6 +27,7 @@ It also installs `AGENTS.md` at the repository root.
 | `docs/Agent_Rules/handoff-packet.md` | Defines the continuity summary for task handoff |
 | `docs/Agent_Rules/lessons.md` | Records corrections, repeated mistakes, and prevention rules |
 | `docs/Agent_Rules/skill-candidates.md` | Tracks repeatable workflows that may become reusable skills |
+| `docs/Agent_Rules/security-audit.md` | Defines audit and quarantine rules for imported agent materials |
 
 ## Agent behavior
 
@@ -36,6 +38,7 @@ It also installs `AGENTS.md` at the repository root.
 5. Use the handoff packet for medium or large work, blocked work, or session-close summaries.
 6. Update lessons when the user corrects the agent.
 7. Update skill candidates when a repeatable workflow emerges.
+8. Audit external rules, skills, scripts, or agent packs before applying them.
 
 ## Design rule
 

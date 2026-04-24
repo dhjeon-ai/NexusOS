@@ -15,6 +15,7 @@ NexusOS installs or adopts a lightweight, node-based project structure built aro
 - task sizing, verification, decision, and handoff rules
 - lessons and skill-candidate memory files
 - optional local runtime reflection/check shim
+- security audit and quarantine guidance for external rules, skills, and scripts
 - stable architecture and component contracts
 - task continuity for medium and large work
 - optional operating-rule packs for long-lived projects
@@ -118,6 +119,7 @@ python ProjectOS/scripts/bootstrap_projectos.py --root /path/to/existing-repo --
 Use `--layer full` when the project also needs task lifecycle, subagent workflow, reporting style, risk exception, and sync check pages.
 
 Use `--runtime local` when you want Hermes-like reflection prompts, a NexusOS check script, runtime event logs, and a pre-commit hook template.
+The local runtime also installs `nexusos_audit.py`, `.nexusos/audit/`, and `.nexusos/quarantine/` for external rule and script review.
 
 This creates a starter operating structure such as:
 
@@ -139,11 +141,15 @@ my-repo/
       handoff-packet.md
       lessons.md
       skill-candidates.md
+      security-audit.md
   scripts/
     nexusos_runtime.py        # only with --runtime local
     check_nexusos.py          # only with --runtime local
+    nexusos_audit.py          # only with --runtime local
   .nexusos/
     runtime/                  # only with --runtime local
+    audit/                    # only with --runtime local
+    quarantine/               # only with --runtime local
   .githooks/
     pre-commit                # only with --runtime local
   project_work_status.md
@@ -186,6 +192,7 @@ The current version already supports:
 - task sizing, verification matrix, decision gate, and handoff packet rules
 - lessons and skill-candidate files for repeated mistake prevention
 - optional local runtime shim with reflection and check commands
+- security audit/quarantine workflow for imported agent materials
 - optional `--layer full` operating-rule pages
 - adoption reconciliation guidance for existing repositories
 - node-based documentation roles

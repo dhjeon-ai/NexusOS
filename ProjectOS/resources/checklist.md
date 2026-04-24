@@ -10,7 +10,8 @@
 - The index page points agents to `nexusos.yaml` before broader context loading.
 - `Agent_Rules/` contains task sizing, verification matrix, decision gates, and handoff packet rules.
 - `Agent_Rules/` contains lessons and skill-candidates files.
-- If `--runtime local` was chosen, scripts and runtime files exist for `nexusos_runtime.py`, `check_nexusos.py`, `.nexusos/runtime/`, and `.githooks/pre-commit`.
+- `Agent_Rules/` contains security-audit rules.
+- If `--runtime local` was chosen, scripts and runtime files exist for `nexusos_runtime.py`, `check_nexusos.py`, `nexusos_audit.py`, `.nexusos/runtime/`, `.nexusos/audit/`, `.nexusos/quarantine/`, and `.githooks/pre-commit`.
 - In adopt mode, existing files were preserved and conflicts were handled with NexusOS-specific candidate files.
 - In adopt mode, an adoption task report lists created files, preserved files, detected structure, and next action.
 - In adopt mode, the adoption task report guides agent-rule reconciliation, documentation entrypoint reconciliation, verification command confirmation, and component draft review.

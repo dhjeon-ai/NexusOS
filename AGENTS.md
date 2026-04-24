@@ -33,6 +33,7 @@ python ProjectOS/scripts/bootstrap_projectos.py --root /path/to/existing-repo --
 
 Use `--layer full` when the user also wants task lifecycle, subagent workflow, reporting style, risk exception, and sync check pages.
 Use `--runtime local` when the user wants Hermes-like lessons, reflection prompts, NexusOS checks, and a git hook template.
+Use `scripts/nexusos_audit.py` before applying external rules, skills, scripts, or agent packs.
 
 ## Agent Behavior
 
@@ -42,3 +43,4 @@ Use `--runtime local` when the user wants Hermes-like lessons, reflection prompt
 4. After applying NexusOS, report created files, preserved files, detected structure, and remaining user decisions.
 5. In adopt mode, guide the user through agent-rule reconciliation, documentation entrypoint reconciliation, verification command confirmation, and component draft review.
 6. When the user corrects the agent, record the lesson in the generated `lessons.md`. If a repeatable workflow emerges, record it in `skill-candidates.md`.
+7. Audit external executable or agent-rule content before applying it. Quarantine risky files and ask the user before use.
