@@ -21,13 +21,42 @@ After the initial inspection, the agent should ask the user one direct confirmat
 
 Only after that confirmation should the scaffold be applied.
 
+## Mode selection
+
+Use `--mode init` when the target repository is new or mostly empty.
+
+Use `--mode adopt` when the target repository already has code, docs, README files, or agent rule files. Adopt mode must preserve existing files and add only missing NexusOS structure.
+
+Use `--layer core` for the base operating standard.
+
+Use `--layer full` when the user also wants task lifecycle, subagent workflow, reporting style, risk exception, and sync check pages.
+
+Use `--runtime local` when the user wants Hermes-like reflection prompts, a local NexusOS check command, runtime event logs, and a git hook template.
+The local runtime also installs security audit and quarantine support.
+
 ## Phase 1. Pick the root contract
 
-Create one root docs folder.
+Create one root `nexusos.yaml` file and one root docs folder.
+
+The repository contract stores the project-specific defaults that agents should not guess:
+
+- project name
+- agent rules file
+- docs root
+- code root
+- status file
+- index file
+- agent rules root
+- context-loading limit
+- verification commands
+
+In adopt mode, infer these defaults from the existing repository when explicit arguments are not provided.
 
 Recommended default:
 
 ```text
+nexusos.yaml
+AGENTS.md
 docs/
   00_Project_Index.md
   01_Architecture/
@@ -35,6 +64,12 @@ docs/
   03_Decisions_ADR/
   04_Archive/
   Active_Tasks/
+  Agent_Rules/
+scripts/                  # only with --runtime local
+.nexusos/runtime/          # only with --runtime local
+.nexusos/audit/            # only with --runtime local
+.nexusos/quarantine/       # only with --runtime local
+.githooks/                 # only with --runtime local
 ```
 
 Create one root session-status file outside the docs folder:
@@ -54,14 +89,53 @@ The index should answer only four things:
 
 Do not turn the index into a long wiki.
 
+The index should point agents back to `nexusos.yaml` for paths, context limits, verification commands, and agent rules.
+
 ## Phase 3. Lock selective loading rules
 
 Add simple operating rules such as:
 
+- read `nexusos.yaml` before assuming repository paths
+- read `AGENTS.md` before starting implementation
 - read one root page first
 - open only directly relevant pages
+- use the configured context limit before editing
 - avoid broad rereads
 - use active task pages only for medium or large work
+
+## Phase 3b. Install the work harness
+
+Create a small agent rule set:
+
+- task sizing
+- verification matrix
+- decision gates
+- handoff packet
+- lessons
+- skill candidates
+- security audit
+
+These files define how agents decide work size, prove completion, stop for human decisions, and preserve continuity.
+
+Lessons and skill candidates create a file-based self-improvement loop:
+
+- corrections and repeated mistakes go to `lessons.md`
+- repeatable workflows go to `skill-candidates.md`
+- `nexusos_runtime.py reflect` nudges agents to update both before final reporting
+
+## Phase 3c. Adopt existing structure
+
+When using adopt mode:
+
+- detect existing docs roots such as `docs/`, `wiki/`, or `documentation/`
+- detect code roots such as `src/`, `app/`, `backend/`, `frontend/`, or `packages/`
+- detect basic verification commands from `package.json`, `pyproject.toml`, `pytest.ini`, `go.mod`, or `Cargo.toml`
+- preserve existing files
+- create `AGENTS.nexusos.md` when `AGENTS.md` already exists
+- create `Task_NexusOS_Adoption.md` with created files, preserved files, and next actions
+- guide the next agent through agent-rule reconciliation, documentation entrypoint reconciliation, verification command confirmation, component draft review, and layer follow-up
+- when `--runtime local` is selected, install `scripts/nexusos_runtime.py`, `scripts/check_nexusos.py`, `.nexusos/runtime/`, and `.githooks/pre-commit`
+- when `--runtime local` is selected, install `scripts/nexusos_audit.py`, `.nexusos/audit/`, and `.nexusos/quarantine/`
 
 ## Phase 4. Define component contracts
 
@@ -98,7 +172,7 @@ Create a decision page only when a future reader would ask:
 
 ## Layer 2 expansion
 
-If the user chooses Layer 2, add rule pages for:
+If the user chooses Layer 2, run with `--layer full` to add rule pages for:
 
 - task lifecycle
 - subagent workflow

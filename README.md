@@ -6,10 +6,16 @@ It helps new projects start with a durable structure instead of growing into sca
 
 ## What it does
 
-NexusOS installs a lightweight, node-based project structure built around:
+NexusOS installs or adopts a lightweight, node-based project structure built around:
 
 - one clear entry document
+- one repository contract file
+- one first-read agent rules file
 - selective context loading
+- task sizing, verification, decision, and handoff rules
+- lessons and skill-candidate memory files
+- optional local runtime reflection/check shim
+- security audit and quarantine guidance for external rules, skills, and scripts
 - stable architecture and component contracts
 - task continuity for medium and large work
 - optional operating-rule packs for long-lived projects
@@ -37,9 +43,12 @@ Use Layer 1 when you want a clean, low-cost project foundation.
 It creates:
 
 - a project index
+- a root `nexusos.yaml` repository contract
+- a root `AGENTS.md` operating guide
 - architecture pages
 - component pages
 - active task pages
+- agent rule pages
 - decision record folders
 - a root session-status file
 
@@ -66,8 +75,11 @@ ProjectOS/
   agents/
     openai.yaml
   references/
+    agent-work-harness.md
     bootstrap-flow.md
+    minimum-context-policy.md
     node-model.md
+    repository-contract.md
     reporting-style.md
     risk-exceptions.md
     subagent-workflow.md
@@ -84,16 +96,37 @@ ProjectOS/
 
 ## Quick start
 
+When using a slash-command skill runtime, use:
+
+```text
+/nexusos-bootstrap
+```
+
+The skill can either initialize a new repository or safely adopt an existing repository.
+
 Bootstrap a new repository:
 
 ```bash
-python ProjectOS/scripts/bootstrap_projectos.py --root /path/to/my-new-repo --project-name "My New Repo"
+python ProjectOS/scripts/bootstrap_projectos.py --root /path/to/my-new-repo --project-name "My New Repo" --mode init --layer core
 ```
+
+Adopt an existing repository without overwriting current files:
+
+```bash
+python ProjectOS/scripts/bootstrap_projectos.py --root /path/to/existing-repo --project-name "Existing Repo" --mode adopt --layer core
+```
+
+Use `--layer full` when the project also needs task lifecycle, subagent workflow, reporting style, risk exception, and sync check pages.
+
+Use `--runtime local` when you want Hermes-like reflection prompts, a NexusOS check script, runtime event logs, and a pre-commit hook template.
+The local runtime also installs `nexusos_audit.py`, `.nexusos/audit/`, and `.nexusos/quarantine/` for external rule and script review.
 
 This creates a starter operating structure such as:
 
 ```text
 my-repo/
+  nexusos.yaml
+  AGENTS.md
   docs/
     00_Project_Index.md
     01_Architecture/
@@ -101,16 +134,41 @@ my-repo/
     03_Decisions_ADR/
     04_Archive/
     Active_Tasks/
+    Agent_Rules/
+      task-sizing.md
+      verification-matrix.md
+      decision-gates.md
+      handoff-packet.md
+      lessons.md
+      skill-candidates.md
+      security-audit.md
+  scripts/
+    nexusos_runtime.py        # only with --runtime local
+    check_nexusos.py          # only with --runtime local
+    nexusos_audit.py          # only with --runtime local
+  .nexusos/
+    runtime/                  # only with --runtime local
+    audit/                    # only with --runtime local
+    quarantine/               # only with --runtime local
+  .githooks/
+    pre-commit                # only with --runtime local
   project_work_status.md
 ```
 
+In adopt mode, NexusOS detects likely docs and code roots, creates component drafts for detected code areas, detects basic verification commands, and writes an adoption task report under `docs/Active_Tasks/`.
+The adoption report guides the next agent through agent-rule reconciliation, documentation entrypoint reconciliation, verification command confirmation, component draft review, and layer follow-up.
+
+If an existing `AGENTS.md` is present, NexusOS preserves it and writes `AGENTS.nexusos.md` instead.
+
 ## How agents should use it
 
-1. Read the minimum repository surface.
-2. Review `resources/activation-checklist.md`.
-3. Decide whether the repository likely needs only Layer 1 or both layers.
-4. Ask the user to confirm one choice.
-5. Apply only the confirmed scope.
+1. Read `nexusos.yaml` for project paths, context limits, and verification defaults.
+2. Read `AGENTS.md` for the shared work rules.
+3. Read the minimum repository surface.
+4. Review `resources/activation-checklist.md`.
+5. Decide whether the repository likely needs only Layer 1 or both layers.
+6. Ask the user to confirm one choice.
+7. Apply only the confirmed scope.
 
 ## Design principles
 
@@ -127,6 +185,16 @@ ProjectOS is a reusable bootstrap package under active refinement.
 The current version already supports:
 
 - core repository scaffolding
+- safe adoption for existing repositories
+- root `nexusos.yaml` repository contracts
+- root `AGENTS.md` agent operating guides
+- minimum-context loading rules
+- task sizing, verification matrix, decision gate, and handoff packet rules
+- lessons and skill-candidate files for repeated mistake prevention
+- optional local runtime shim with reflection and check commands
+- security audit/quarantine workflow for imported agent materials
+- optional `--layer full` operating-rule pages
+- adoption reconciliation guidance for existing repositories
 - node-based documentation roles
 - layered operating-rule design
 - user-confirmed scope selection before expansion
