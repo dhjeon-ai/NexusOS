@@ -93,6 +93,14 @@ ProjectOS/
 
 ## Quick start
 
+When using a slash-command skill runtime, use:
+
+```text
+/nexusos-bootstrap
+```
+
+The skill can either initialize a new repository or safely adopt an existing repository.
+
 Bootstrap a new repository:
 
 ```bash

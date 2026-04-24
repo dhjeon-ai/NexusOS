@@ -1,4 +1,4 @@
 version: 1
 display_name: NexusOS Bootstrap
 short_description: Bootstraps a durable agent work standard with repository contracts, AGENTS.md, and low-context docs.
-default_prompt: Set up NexusOS for this repository so agents share the same paths, context-loading rules, task sizing, verification gates, and handoff flow.
+default_prompt: Use /nexusos-bootstrap to set up or adopt NexusOS for this repository so agents share the same paths, context-loading rules, task sizing, verification gates, and handoff flow.

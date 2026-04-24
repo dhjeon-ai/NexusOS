@@ -5,6 +5,10 @@ description: Use when starting a new repository or adopting an existing reposito
 
 # ProjectOS
 
+## Skill command
+
+Use `/nexusos-bootstrap` when the runtime supports slash-command skills.
+
 ## When to use
 - A new project needs a durable structure before feature work starts.
 - An existing project needs to be safely organized under NexusOS rules without overwriting current files.
