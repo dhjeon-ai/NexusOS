@@ -9,6 +9,8 @@
 - The index page tells a new reader what to open first.
 - The index page points agents to `nexusos.yaml` before broader context loading.
 - `Agent_Rules/` contains task sizing, verification matrix, decision gates, and handoff packet rules.
+- In adopt mode, existing files were preserved and conflicts were handled with NexusOS-specific candidate files.
+- In adopt mode, an adoption task report lists created files, preserved files, detected structure, and next action.
 - Architecture, component, task, and decision folders exist.
 - The session-status file exists at the repository root.
 - Selective-loading rules are written down.

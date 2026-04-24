@@ -6,7 +6,7 @@ It helps new projects start with a durable structure instead of growing into sca
 
 ## What it does
 
-NexusOS installs a lightweight, node-based project structure built around:
+NexusOS installs or adopts a lightweight, node-based project structure built around:
 
 - one clear entry document
 - one repository contract file
@@ -96,7 +96,13 @@ ProjectOS/
 Bootstrap a new repository:
 
 ```bash
-python ProjectOS/scripts/bootstrap_projectos.py --root /path/to/my-new-repo --project-name "My New Repo"
+python ProjectOS/scripts/bootstrap_projectos.py --root /path/to/my-new-repo --project-name "My New Repo" --mode init
+```
+
+Adopt an existing repository without overwriting current files:
+
+```bash
+python ProjectOS/scripts/bootstrap_projectos.py --root /path/to/existing-repo --project-name "Existing Repo" --mode adopt
 ```
 
 This creates a starter operating structure such as:
@@ -119,6 +125,10 @@ my-repo/
       handoff-packet.md
   project_work_status.md
 ```
+
+In adopt mode, NexusOS detects likely docs and code roots, creates component drafts for detected code areas, detects basic verification commands, and writes an adoption task report under `docs/Active_Tasks/`.
+
+If an existing `AGENTS.md` is present, NexusOS preserves it and writes `AGENTS.nexusos.md` instead.
 
 ## How agents should use it
 
@@ -145,6 +155,7 @@ ProjectOS is a reusable bootstrap package under active refinement.
 The current version already supports:
 
 - core repository scaffolding
+- safe adoption for existing repositories
 - root `nexusos.yaml` repository contracts
 - root `AGENTS.md` agent operating guides
 - minimum-context loading rules

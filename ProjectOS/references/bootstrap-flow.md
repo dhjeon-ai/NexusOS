@@ -21,6 +21,12 @@ After the initial inspection, the agent should ask the user one direct confirmat
 
 Only after that confirmation should the scaffold be applied.
 
+## Mode selection
+
+Use `--mode init` when the target repository is new or mostly empty.
+
+Use `--mode adopt` when the target repository already has code, docs, README files, or agent rule files. Adopt mode must preserve existing files and add only missing NexusOS structure.
+
 ## Phase 1. Pick the root contract
 
 Create one root `nexusos.yaml` file and one root docs folder.
@@ -36,6 +42,8 @@ The repository contract stores the project-specific defaults that agents should 
 - agent rules root
 - context-loading limit
 - verification commands
+
+In adopt mode, infer these defaults from the existing repository when explicit arguments are not provided.
 
 Recommended default:
 
@@ -93,6 +101,17 @@ Create a small agent rule set:
 - handoff packet
 
 These files define how agents decide work size, prove completion, stop for human decisions, and preserve continuity.
+
+## Phase 3c. Adopt existing structure
+
+When using adopt mode:
+
+- detect existing docs roots such as `docs/`, `wiki/`, or `documentation/`
+- detect code roots such as `src/`, `app/`, `backend/`, `frontend/`, or `packages/`
+- detect basic verification commands from `package.json`, `pyproject.toml`, `pytest.ini`, `go.mod`, or `Cargo.toml`
+- preserve existing files
+- create `AGENTS.nexusos.md` when `AGENTS.md` already exists
+- create `Task_NexusOS_Adoption.md` with created files, preserved files, and next actions
 
 ## Phase 4. Define component contracts
 

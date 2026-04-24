@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import dataclass
 from pathlib import Path
 
 
@@ -27,8 +28,8 @@ context:
   rule: "Read nexusos.yaml, the agent rules file, and the index first; then open only directly relevant architecture, component, task, or agent rule pages."
 
 verification:
-  default_commands: []
-  notes: "Add project-specific test, lint, build, or smoke-check commands here."
+  default_commands:{verification_commands}
+  notes: "{verification_notes}"
 
 profiles:
   active:
@@ -144,13 +145,14 @@ INDEX_TEMPLATE = """# {project_name} - Project Index
 
 | File | Module Path | Role |
 |---|---|---|
-| [[02_Components/Main_Component]] | `<fill-me>` | Primary module or service |
+{component_rows}
 
 ## Active Work
 
 | File | Status |
 |---|---|
 | [[Active_Tasks/Task_Initial_Setup]] | Ready |
+{adoption_task_row}
 """
 
 
@@ -196,6 +198,24 @@ COMPONENT_TEMPLATE = """# Main Component
 """
 
 
+DISCOVERED_COMPONENT_TEMPLATE = """# {component_name}
+
+- **Source Path**: `{source_path}`
+- **Role**: Describe the responsibility of this detected project area.
+- **Related Components**: `TBD`
+
+## Key Contracts
+- Input: `TBD`
+- Output: `TBD`
+
+## Policies & Constraints
+- Replace with the main operating rules for this component.
+
+## Known Issues / Risks
+- Verify this generated draft against the actual code before treating it as source of truth.
+"""
+
+
 TASK_TEMPLATE = """# Task: Initial Setup
 
 - **Status**: Ready
@@ -205,6 +225,38 @@ TASK_TEMPLATE = """# Task: Initial Setup
 ## Goal
 
 Stand up the first stable ProjectOS structure for this repository.
+"""
+
+
+ADOPTION_TASK_TEMPLATE = """# Task: NexusOS Adoption
+
+- **Status**: Ready
+- **Created**: {created}
+- **Components Touched**: `Project structure`, `Agent rules`, `Documentation`
+
+## Goal
+
+Bring this existing repository under the NexusOS operating standard without overwriting existing project files.
+
+## Detected Structure
+
+- Docs root: `{docs_root}`
+- Code root: `{code_root}`
+- Agent rules file: `{agents_file}`
+- Status file: `{status_file}`
+- Verification commands: {verification_summary}
+
+## Files Created
+
+{created_files}
+
+## Files Preserved
+
+{preserved_files}
+
+## Next Action
+
+Review generated component drafts and fill in project-specific verification commands if needed.
 """
 
 
@@ -299,18 +351,109 @@ Use this format when a task is medium or large, a session is ending, or another 
 """
 
 
-def write_if_missing(path: Path, content: str) -> None:
+@dataclass
+class WriteResult:
+    created: list[str]
+    preserved: list[str]
+
+
+def write_tracked(path: Path, content: str, root: Path, result: WriteResult) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    if not path.exists():
-        path.write_text(content, encoding="utf-8")
+    rel_path = path.relative_to(root).as_posix()
+    if path.exists():
+        result.preserved.append(rel_path)
+        return
+    path.write_text(content, encoding="utf-8")
+    result.created.append(rel_path)
+
+
+def detect_docs_root(root: Path) -> str:
+    for candidate in ["docs", "wiki", "Wiki", "documentation", "Documentation"]:
+        if (root / candidate).is_dir():
+            return candidate
+    return "docs"
+
+
+def detect_code_roots(root: Path) -> list[str]:
+    candidates = ["src", "app", "apps", "lib", "server", "backend", "frontend", "client", "packages"]
+    found = [candidate for candidate in candidates if (root / candidate).is_dir()]
+    if found:
+        return found
+
+    marker_files = ["package.json", "pyproject.toml", "go.mod", "Cargo.toml"]
+    if any((root / marker).exists() for marker in marker_files):
+        return ["."]
+
+    return ["src"]
+
+
+def detect_verification_commands(root: Path) -> list[str]:
+    commands: list[str] = []
+    if (root / "package.json").exists():
+        commands.append("npm test")
+    if (
+        (root / "pyproject.toml").exists()
+        or (root / "pytest.ini").exists()
+        or (root / "tests").is_dir()
+    ):
+        commands.append("pytest")
+    if (root / "go.mod").exists():
+        commands.append("go test ./...")
+    if (root / "Cargo.toml").exists():
+        commands.append("cargo test")
+    return commands
+
+
+def format_yaml_list(items: list[str]) -> str:
+    if not items:
+        return " []"
+    return "\n" + "\n".join(f'    - "{item}"' for item in items)
+
+
+def choose_agents_file(root: Path, requested: str, mode: str) -> str:
+    requested_path = root / requested
+    if mode == "adopt" and requested_path.exists():
+        requested_obj = Path(requested)
+        suffix = requested_obj.suffix or ".md"
+        stem = requested_obj.stem or "AGENTS"
+        parent = requested_obj.parent
+        return (parent / f"{stem}.nexusos{suffix}").as_posix()
+    return requested
+
+
+def make_component_name(source_path: str) -> str:
+    if source_path == ".":
+        return "Repository_Root"
+    normalized = source_path.replace("\\", "/").strip("/")
+    parts = [part for part in normalized.replace("-", "_").split("/") if part]
+    return "_".join(part[:1].upper() + part[1:] for part in parts) or "Main_Component"
+
+
+def format_component_rows(component_names: list[str], source_paths: list[str]) -> str:
+    rows = []
+    for name, source_path in zip(component_names, source_paths):
+        rows.append(f"| [[02_Components/{name}]] | `{source_path}` | Detected project area |")
+    return "\n".join(rows)
+
+
+def format_adoption_summary(items: list[str]) -> str:
+    if not items:
+        return "- None"
+    return "\n".join(f"- `{item}`" for item in items)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Bootstrap a ProjectOS starter structure.")
     parser.add_argument("--root", required=True, help="Target repository root path")
     parser.add_argument("--project-name", required=True, help="Project display name")
-    parser.add_argument("--docs-root", default="docs", help="Docs root folder relative to the repository root")
-    parser.add_argument("--code-root", default="src", help="Primary code root relative to the repository root")
+    parser.add_argument(
+        "--mode",
+        choices=["init", "adopt"],
+        default="init",
+        help="init creates a starter structure; adopt safely adds NexusOS to an existing repository",
+    )
+    parser.add_argument("--docs-root", default=None, help="Docs root folder relative to the repository root")
+    parser.add_argument("--code-root", default=None, help="Primary code root relative to the repository root")
     parser.add_argument(
         "--agents-file",
         default="AGENTS.md",
@@ -324,68 +467,147 @@ def main() -> None:
     args = parser.parse_args()
 
     root = Path(args.root).resolve()
-    docs_root = root / args.docs_root
+    docs_root_name = args.docs_root or (detect_docs_root(root) if args.mode == "adopt" else "docs")
+    detected_code_roots = detect_code_roots(root) if args.mode == "adopt" else [args.code_root or "src"]
+    code_root_name = args.code_root or detected_code_roots[0]
+    agents_file_name = choose_agents_file(root, args.agents_file, args.mode)
+    verification_commands = detect_verification_commands(root) if args.mode == "adopt" else []
+    verification_notes = (
+        "Detected default commands from project files. Confirm they are correct."
+        if verification_commands
+        else "Add project-specific test, lint, build, or smoke-check commands here."
+    )
+    docs_root = root / docs_root_name
     created = "YYYY-MM-DD"
+    result = WriteResult(created=[], preserved=[])
+    if agents_file_name != args.agents_file and (root / args.agents_file).exists():
+        result.preserved.append(args.agents_file)
+    component_source_paths = detected_code_roots if args.mode == "adopt" else [code_root_name]
+    component_names = [make_component_name(path) for path in component_source_paths]
+    component_rows = (
+        format_component_rows(component_names, component_source_paths)
+        if args.mode == "adopt"
+        else "| [[02_Components/Main_Component]] | `<fill-me>` | Primary module or service |"
+    )
+    adoption_task_row = "| [[Active_Tasks/Task_NexusOS_Adoption]] | Ready |" if args.mode == "adopt" else ""
 
-    write_if_missing(
+    write_tracked(
         root / "nexusos.yaml",
         NEXUSOS_CONFIG_TEMPLATE.format(
             project_name=args.project_name,
-            agents_file=args.agents_file,
-            docs_root=args.docs_root,
-            code_root=args.code_root,
+            agents_file=agents_file_name,
+            docs_root=docs_root_name,
+            code_root=code_root_name,
             status_file=args.status_file,
+            verification_commands=format_yaml_list(verification_commands),
+            verification_notes=verification_notes,
         ),
+        root,
+        result,
     )
-    write_if_missing(
-        root / args.agents_file,
+    write_tracked(
+        root / agents_file_name,
         AGENTS_TEMPLATE.format(
             project_name=args.project_name,
-            docs_root=args.docs_root,
-            code_root=args.code_root,
+            docs_root=docs_root_name,
+            code_root=code_root_name,
             status_file=args.status_file,
         ),
+        root,
+        result,
     )
-    write_if_missing(
+    write_tracked(
         docs_root / "00_Project_Index.md",
-        INDEX_TEMPLATE.format(project_name=args.project_name),
+        INDEX_TEMPLATE.format(
+            project_name=args.project_name,
+            component_rows=component_rows,
+            adoption_task_row=adoption_task_row,
+        ),
+        root,
+        result,
     )
-    write_if_missing(
+    write_tracked(
         docs_root / "01_Architecture" / "Directory_Structure.md",
-        DIRECTORY_TEMPLATE.format(docs_root=args.docs_root, code_root=args.code_root),
+        DIRECTORY_TEMPLATE.format(docs_root=docs_root_name, code_root=code_root_name),
+        root,
+        result,
     )
-    write_if_missing(
+    write_tracked(
         docs_root / "01_Architecture" / "Data_Flows.md",
         DATA_FLOWS_TEMPLATE,
+        root,
+        result,
     )
-    write_if_missing(
-        docs_root / "02_Components" / "Main_Component.md",
-        COMPONENT_TEMPLATE.format(code_root=args.code_root),
-    )
-    write_if_missing(
+    if args.mode == "adopt":
+        for component_name, source_path in zip(component_names, component_source_paths):
+            write_tracked(
+                docs_root / "02_Components" / f"{component_name}.md",
+                DISCOVERED_COMPONENT_TEMPLATE.format(
+                    component_name=component_name,
+                    source_path=source_path,
+                ),
+                root,
+                result,
+            )
+    else:
+        write_tracked(
+            docs_root / "02_Components" / "Main_Component.md",
+            COMPONENT_TEMPLATE.format(code_root=code_root_name),
+            root,
+            result,
+        )
+    write_tracked(
         docs_root / "Active_Tasks" / "Task_Initial_Setup.md",
         TASK_TEMPLATE.format(created=created),
+        root,
+        result,
     )
-    write_if_missing(
+    write_tracked(
         docs_root / "Agent_Rules" / "task-sizing.md",
         TASK_SIZING_TEMPLATE,
+        root,
+        result,
     )
-    write_if_missing(
+    write_tracked(
         docs_root / "Agent_Rules" / "verification-matrix.md",
         VERIFICATION_MATRIX_TEMPLATE,
+        root,
+        result,
     )
-    write_if_missing(
+    write_tracked(
         docs_root / "Agent_Rules" / "decision-gates.md",
         DECISION_GATES_TEMPLATE,
+        root,
+        result,
     )
-    write_if_missing(
+    write_tracked(
         docs_root / "Agent_Rules" / "handoff-packet.md",
         HANDOFF_PACKET_TEMPLATE,
+        root,
+        result,
     )
-    write_if_missing(
+    write_tracked(
         root / args.status_file,
         STATUS_TEMPLATE.format(created=created),
+        root,
+        result,
     )
+    if args.mode == "adopt":
+        write_tracked(
+            docs_root / "Active_Tasks" / "Task_NexusOS_Adoption.md",
+            ADOPTION_TASK_TEMPLATE.format(
+                created=created,
+                docs_root=docs_root_name,
+                code_root=code_root_name,
+                agents_file=agents_file_name,
+                status_file=args.status_file,
+                verification_summary=", ".join(verification_commands) if verification_commands else "None detected",
+                created_files=format_adoption_summary(result.created),
+                preserved_files=format_adoption_summary(result.preserved),
+            ),
+            root,
+            result,
+        )
 
     for folder in [
         docs_root / "03_Decisions_ADR",
@@ -393,7 +615,9 @@ def main() -> None:
     ]:
         folder.mkdir(parents=True, exist_ok=True)
 
-    print(f"ProjectOS scaffold created at {root}")
+    print(f"ProjectOS {args.mode} completed at {root}")
+    print(f"Created files: {len(result.created)}")
+    print(f"Preserved existing files: {len(result.preserved)}")
 
 
 if __name__ == "__main__":

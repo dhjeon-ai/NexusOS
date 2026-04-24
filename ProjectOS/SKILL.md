@@ -1,12 +1,13 @@
 ---
 name: nexusos-bootstrap
-description: Use when starting a new repository and the project needs a durable agent work standard with a repository contract file, AGENTS.md rules, low-context entry documents, task sizing, verification gates, handoff packets, component maps, and task flow that stay cheap to load over time.
+description: Use when starting a new repository or adopting an existing repository into a durable agent work standard with a repository contract file, AGENTS.md rules, low-context entry documents, task sizing, verification gates, handoff packets, component maps, and task flow that stay cheap to load over time.
 ---
 
 # ProjectOS
 
 ## When to use
 - A new project needs a durable structure before feature work starts.
+- An existing project needs to be safely organized under NexusOS rules without overwriting current files.
 - The repository should stay easy for humans and agents to understand with low context cost.
 - You want one clear entry point, selective loading rules, and stable documentation contracts.
 
@@ -32,19 +33,23 @@ Create a project operating system with two expandable layers:
 4. Decide whether the repository needs only Layer 1 or both Layer 1 and Layer 2.
 5. Ask the user to confirm exactly one choice:
    `Do you want ProjectOS core structure only, or core structure plus operating rules?`
-6. Run `scripts/bootstrap_projectos.py --root <PROJECT_ROOT> --project-name <NAME>` after the user confirms the scope. Add `--docs-root`, `--code-root`, `--agents-file`, or `--status-file` when the repository already has preferred names.
-7. If the user chooses Layer 2, also read:
+6. Choose the script mode:
+   - Use `--mode init` for a new or empty repository.
+   - Use `--mode adopt` for an existing repository that already has source files, docs, or agent rules.
+7. Run `scripts/bootstrap_projectos.py --root <PROJECT_ROOT> --project-name <NAME> --mode <init|adopt>` after the user confirms the scope. Add `--docs-root`, `--code-root`, `--agents-file`, or `--status-file` when the repository already has preferred names.
+8. If the user chooses Layer 2, also read:
    - `references/task-lifecycle.md`
    - `references/subagent-workflow.md`
    - `references/reporting-style.md`
    - `references/risk-exceptions.md`
    - `references/sync-checks.md`
-8. Customize the generated index, component pages, and rule pages for the target repository.
-9. Verify the result with `resources/checklist.md`.
+9. Customize the generated index, component pages, and rule pages for the target repository.
+10. Verify the result with `resources/checklist.md`.
 
 ## Capability map
 
 - Bootstrap docs and operating folders: `scripts/bootstrap_projectos.py`
+- Adopt existing repositories safely: `scripts/bootstrap_projectos.py --mode adopt`
 - Define project-specific paths and agent defaults: generated `nexusos.yaml`
 - Install first-read agent rules: generated `AGENTS.md`
 - Install work harness rules: generated `docs/Agent_Rules/`
@@ -65,6 +70,7 @@ Create a project operating system with two expandable layers:
 - Treat documents as nodes with clear roles: index, architecture, components, tasks, decisions, session status.
 - Prefer durable contracts over long narrative notes.
 - Do not apply Layer 2 rules automatically. Inspect first, then ask the user to choose whether Layer 2 is needed.
+- In adopt mode, preserve existing files. If the requested `AGENTS.md` already exists, generate `AGENTS.nexusos.md` and point `nexusos.yaml` to it.
 
 ## How to execute
 

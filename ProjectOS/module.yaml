@@ -24,6 +24,10 @@ capabilities:
     route: scripts/bootstrap_projectos.py
     method: N/A
     notes: Creates nexusos.yaml, AGENTS.md, starter docs, task, component, decision, and agent-rule folders plus the root session-status file.
+  - id: adopt-existing-repository
+    route: scripts/bootstrap_projectos.py
+    method: N/A
+    notes: Safely adds NexusOS to an existing repository, preserving current files, detecting roots and verification commands, and creating an adoption report.
   - id: define-repository-contract
     route: references/repository-contract.md
     method: N/A
@@ -53,6 +57,7 @@ runtime_rules:
   - The repository root should contain nexusos.yaml with path, context, and verification defaults.
   - Agents should read nexusos.yaml before assuming repository paths.
   - The repository root should contain AGENTS.md or the configured equivalent agent rules file.
+  - Adopt mode should preserve existing files and write NexusOS-specific candidate files when a root rules file already exists.
   - The index file should stay short enough to be loaded first on every task.
   - Project-specific rules should live in scoped pages, not inside the root skill contract.
   - New tasks should be tracked only when the work is large enough to need continuity.
