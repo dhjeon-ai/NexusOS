@@ -19,6 +19,9 @@ paths:
   status_file: "{status_file}"
   index_file: "{docs_root}/00_Project_Index.md"
   agent_rules_root: "{docs_root}/Agent_Rules"
+  lessons_file: "{docs_root}/Agent_Rules/lessons.md"
+  skill_candidates_file: "{docs_root}/Agent_Rules/skill-candidates.md"
+  runtime_root: ".nexusos/runtime"
 
 context:
   first_read:
@@ -34,7 +37,7 @@ verification:
 profiles:
   active:
     - core
-{layer_profile}
+{profile_lines}
 """
 
 
@@ -55,6 +58,7 @@ Status file: `{status_file}`
 2. Read `{docs_root}/00_Project_Index.md`.
 3. Open only the directly relevant architecture, component, active task, or agent rule pages.
 4. Before editing, identify the target file, adjacent call sites, and minimum verification path.
+5. If `.nexusos/runtime/` exists, run `python scripts/nexusos_runtime.py start --root .` at task start when practical.
 
 Default context limit: open no more than 3 additional context pages before editing unless the task has security, data-loss, path-contract, or state-transition risk.
 
@@ -100,6 +104,14 @@ Keep `{status_file}` short and current during meaningful work. For medium or lar
 ## 6. Keep Changes Minimal
 
 Prefer the smallest change that solves the task. Do not rewrite unrelated files. Do not add new rules or documents unless the task needs them.
+
+## 7. Learn From Corrections
+
+Use `{docs_root}/Agent_Rules/lessons.md`.
+
+When the user corrects the agent, record the mistake, root cause, and prevention rule before continuing. If the task revealed a repeatable workflow, add it to `{docs_root}/Agent_Rules/skill-candidates.md`.
+
+If `.nexusos/runtime/` exists, run `python scripts/nexusos_runtime.py reflect --root .` before final reporting when practical.
 """
 
 
@@ -141,6 +153,8 @@ INDEX_TEMPLATE = """# {project_name} - Project Index
 | [[Agent_Rules/verification-matrix]] | Minimum verification by change type |
 | [[Agent_Rules/decision-gates]] | User confirmation gates for high-risk work |
 | [[Agent_Rules/handoff-packet]] | Session and task handoff format |
+| [[Agent_Rules/lessons]] | Repeated mistake prevention and correction capture |
+| [[Agent_Rules/skill-candidates]] | Candidate workflows to promote into reusable skills |
 {operating_rule_rows}
 
 ## Core Components
@@ -279,6 +293,10 @@ Generated component pages are drafts. Review each page under `{docs_root}/02_Com
 
 {layer_follow_up}
 
+## Runtime Follow-up
+
+{runtime_follow_up}
+
 ## Next Action
 
 Choose the next reconciliation step above before treating the adoption as complete.
@@ -361,6 +379,242 @@ When code behavior changes a documented contract, update the matching component 
 ## Project-specific checks
 
 - Add checks here as the project matures.
+"""
+
+
+LESSONS_TEMPLATE = """# Lessons
+
+Use this file to prevent repeated agent mistakes.
+
+## Rule
+
+When the user corrects the agent, immediately add a lesson before continuing when practical.
+
+## What to Record
+
+- User corrections
+- Repeated mistakes
+- Tool or environment quirks
+- Project conventions that prevented an error
+- Better verification steps discovered during work
+
+## What to Skip
+
+- One-off task details
+- Large logs or raw output
+- Obvious facts that are already documented elsewhere
+
+## Lesson Format
+
+### YYYY-MM-DD - Short Title
+
+- **Mistake/Correction**:
+- **Root Cause**:
+- **Prevention Rule**:
+- **Applies To**:
+
+## Active Lessons
+
+Add new lessons here.
+"""
+
+
+SKILL_CANDIDATES_TEMPLATE = """# Skill Candidates
+
+Use this file for workflows that may deserve reusable skills later.
+
+## Rule
+
+When the agent discovers a repeatable workflow, records a multi-step workaround, or gets corrected on a procedure that will recur, add a candidate entry.
+
+## Candidate Format
+
+### YYYY-MM-DD - Candidate Name
+
+- **Trigger**:
+- **Workflow**:
+- **Pitfalls**:
+- **Verification**:
+- **Promote When**:
+
+## Candidates
+
+Add new candidates here.
+"""
+
+
+RUNTIME_SCRIPT_TEMPLATE = '''from __future__ import annotations
+
+import argparse
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+
+
+def utc_now() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def ensure_runtime(root: Path) -> Path:
+    runtime = root / ".nexusos" / "runtime"
+    runtime.mkdir(parents=True, exist_ok=True)
+    state = runtime / "state.json"
+    if not state.exists():
+        state.write_text(
+            json.dumps({"created_at": utc_now(), "last_event": None}, indent=2) + "\\n",
+            encoding="utf-8",
+        )
+    events = runtime / "events.jsonl"
+    if not events.exists():
+        events.write_text("", encoding="utf-8")
+    return runtime
+
+
+def append_event(runtime: Path, event: str, note: str = "") -> None:
+    payload = {"time": utc_now(), "event": event, "note": note}
+    with (runtime / "events.jsonl").open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(payload, ensure_ascii=True) + "\\n")
+    state = runtime / "state.json"
+    state.write_text(
+        json.dumps({"last_event": payload, "updated_at": utc_now()}, indent=2) + "\\n",
+        encoding="utf-8",
+    )
+
+
+def command_start(root: Path, note: str) -> int:
+    runtime = ensure_runtime(root)
+    append_event(runtime, "start", note)
+    print("NexusOS runtime start recorded.")
+    print("Read nexusos.yaml, the configured agent rules file, and the project index before editing.")
+    return 0
+
+
+def command_reflect(root: Path, note: str) -> int:
+    runtime = ensure_runtime(root)
+    append_event(runtime, "reflect", note)
+    print("NexusOS reflection prompt:")
+    print("- Did the user correct the agent? If yes, update docs/Agent_Rules/lessons.md.")
+    print("- Did this reveal a repeatable workflow? If yes, update docs/Agent_Rules/skill-candidates.md.")
+    print("- Did verification commands or project conventions change? If yes, update nexusos.yaml or docs.")
+    print("- Is any adoption reconciliation still open? If yes, report it before calling the task complete.")
+    return 0
+
+
+def command_check(root: Path, note: str) -> int:
+    runtime = ensure_runtime(root)
+    append_event(runtime, "check", note)
+    check_script = root / "scripts" / "check_nexusos.py"
+    if check_script.exists():
+        print(f"Run: python {check_script.as_posix()} --root {root.as_posix()}")
+    else:
+        print("scripts/check_nexusos.py is missing.")
+        return 1
+    return 0
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="NexusOS local runtime shim.")
+    parser.add_argument("command", choices=["start", "reflect", "check"])
+    parser.add_argument("--root", default=".", help="Repository root")
+    parser.add_argument("--note", default="", help="Optional event note")
+    args = parser.parse_args()
+
+    root = Path(args.root).resolve()
+    if args.command == "start":
+        return command_start(root, args.note)
+    if args.command == "reflect":
+        return command_reflect(root, args.note)
+    if args.command == "check":
+        return command_check(root, args.note)
+    return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+'''
+
+
+CHECK_SCRIPT_TEMPLATE = '''from __future__ import annotations
+
+import argparse
+import sys
+from pathlib import Path
+
+
+def read_text(path: Path) -> str:
+    if not path.exists():
+        return ""
+    return path.read_text(encoding="utf-8", errors="replace")
+
+
+def check(root: Path) -> tuple[int, list[str]]:
+    issues: list[str] = []
+
+    nexusos_yaml = root / "nexusos.yaml"
+    if not nexusos_yaml.exists():
+        issues.append("missing nexusos.yaml")
+
+    config_text = read_text(nexusos_yaml)
+    agent_file = "AGENTS.md"
+    lessons_file = "docs/Agent_Rules/lessons.md"
+    skill_candidates_file = "docs/Agent_Rules/skill-candidates.md"
+
+    for line in config_text.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("agents_file:"):
+            agent_file = stripped.split(":", 1)[1].strip().strip('"')
+        elif stripped.startswith("lessons_file:"):
+            lessons_file = stripped.split(":", 1)[1].strip().strip('"')
+        elif stripped.startswith("skill_candidates_file:"):
+            skill_candidates_file = stripped.split(":", 1)[1].strip().strip('"')
+
+    agent_path = root / agent_file
+    if not agent_path.exists():
+        issues.append(f"missing agent rules file: {agent_file}")
+
+    agent_text = read_text(agent_path)
+    if "lessons.md" not in agent_text:
+        issues.append(f"agent rules file does not reference lessons.md: {agent_file}")
+    if "skill-candidates.md" not in agent_text:
+        issues.append(f"agent rules file does not reference skill-candidates.md: {agent_file}")
+
+    if not (root / lessons_file).exists():
+        issues.append(f"missing lessons file: {lessons_file}")
+    if not (root / skill_candidates_file).exists():
+        issues.append(f"missing skill candidates file: {skill_candidates_file}")
+
+    adoption_files = list((root / "docs" / "Active_Tasks").glob("Task_NexusOS_Adoption.md"))
+    for adoption_file in adoption_files:
+        text = read_text(adoption_file)
+        if "Choose the next reconciliation step" in text:
+            issues.append(f"adoption reconciliation may still be open: {adoption_file.relative_to(root).as_posix()}")
+
+    return (1 if issues else 0), issues
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Check NexusOS installation health.")
+    parser.add_argument("--root", default=".", help="Repository root")
+    args = parser.parse_args()
+
+    root = Path(args.root).resolve()
+    code, issues = check(root)
+    if issues:
+        print("NexusOS check: has risks")
+        for issue in issues:
+            print(f"- {issue}")
+    else:
+        print("NexusOS check: working")
+    return code
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+'''
+
+
+PRE_COMMIT_HOOK_TEMPLATE = """#!/usr/bin/env sh
+python scripts/check_nexusos.py --root .
 """
 
 
@@ -615,10 +869,15 @@ def format_component_review_items(component_names: list[str]) -> str:
     return "\n".join(f"- Review `02_Components/{name}.md`." for name in component_names)
 
 
-def format_layer_profile(layer: str) -> str:
-    if layer != "full":
+def format_profile_lines(layer: str, runtime: str) -> str:
+    lines: list[str] = []
+    if layer == "full":
+        lines.append("    - operating-rules")
+    if runtime == "local":
+        lines.append("    - local-runtime")
+    if not lines:
         return ""
-    return "    - operating-rules"
+    return "\n".join(lines)
 
 
 def format_layer_follow_up(layer: str, docs_root_name: str) -> str:
@@ -630,6 +889,18 @@ def format_layer_follow_up(layer: str, docs_root_name: str) -> str:
     return (
         "Layer `core` was selected. If the project needs stronger task lifecycle, "
         "subagent, reporting, risk, or sync rules later, rerun with `--layer full` or add those pages manually."
+    )
+
+
+def format_runtime_follow_up(runtime: str) -> str:
+    if runtime == "local":
+        return (
+            "Local runtime shim was selected. Use `python scripts/nexusos_runtime.py start --root .` "
+            "at task start and `python scripts/nexusos_runtime.py reflect --root .` before final reporting when practical."
+        )
+    return (
+        "Runtime shim was not selected. Lessons and skill candidates still exist as files, "
+        "but no local runtime/check scripts were installed."
     )
 
 
@@ -648,6 +919,12 @@ def main() -> None:
         choices=["core", "full"],
         default="core",
         help="core installs the base work standard; full also installs operating-rule pages",
+    )
+    parser.add_argument(
+        "--runtime",
+        choices=["none", "local"],
+        default="none",
+        help="local installs a lightweight NexusOS runtime shim, check script, and git hook template",
     )
     parser.add_argument("--docs-root", default=None, help="Docs root folder relative to the repository root")
     parser.add_argument("--code-root", default=None, help="Primary code root relative to the repository root")
@@ -699,7 +976,7 @@ def main() -> None:
             status_file=args.status_file,
             verification_commands=format_yaml_list(verification_commands),
             verification_notes=verification_notes,
-            layer_profile=format_layer_profile(args.layer),
+            profile_lines=format_profile_lines(args.layer, args.runtime),
         ),
         root,
         result,
@@ -787,6 +1064,18 @@ def main() -> None:
         result,
     )
     write_tracked(
+        docs_root / "Agent_Rules" / "lessons.md",
+        LESSONS_TEMPLATE,
+        root,
+        result,
+    )
+    write_tracked(
+        docs_root / "Agent_Rules" / "skill-candidates.md",
+        SKILL_CANDIDATES_TEMPLATE,
+        root,
+        result,
+    )
+    write_tracked(
         root / args.status_file,
         STATUS_TEMPLATE.format(created=created),
         root,
@@ -841,7 +1130,41 @@ def main() -> None:
                 verification_confirmation=format_verification_confirmation(verification_commands),
                 component_review_items=format_component_review_items(component_names),
                 layer_follow_up=format_layer_follow_up(args.layer, docs_root_name),
+                runtime_follow_up=format_runtime_follow_up(args.runtime),
             ),
+            root,
+            result,
+        )
+    if args.runtime == "local":
+        write_tracked(
+            root / "scripts" / "nexusos_runtime.py",
+            RUNTIME_SCRIPT_TEMPLATE,
+            root,
+            result,
+        )
+        write_tracked(
+            root / "scripts" / "check_nexusos.py",
+            CHECK_SCRIPT_TEMPLATE,
+            root,
+            result,
+        )
+        write_tracked(
+            root / ".githooks" / "pre-commit",
+            PRE_COMMIT_HOOK_TEMPLATE,
+            root,
+            result,
+        )
+        runtime_root = root / ".nexusos" / "runtime"
+        runtime_root.mkdir(parents=True, exist_ok=True)
+        write_tracked(
+            runtime_root / "state.json",
+            "{\n  \"created_by\": \"nexusos-bootstrap\",\n  \"status\": \"ready\"\n}\n",
+            root,
+            result,
+        )
+        write_tracked(
+            runtime_root / "events.jsonl",
+            "",
             root,
             result,
         )

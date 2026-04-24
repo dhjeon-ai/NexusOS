@@ -10,6 +10,8 @@ The bootstrap script installs these files under `docs/Agent_Rules/` by default:
 - `verification-matrix.md`
 - `decision-gates.md`
 - `handoff-packet.md`
+- `lessons.md`
+- `skill-candidates.md`
 
 It also installs `AGENTS.md` at the repository root.
 
@@ -22,6 +24,8 @@ It also installs `AGENTS.md` at the repository root.
 | `docs/Agent_Rules/verification-matrix.md` | Maps change types to minimum verification |
 | `docs/Agent_Rules/decision-gates.md` | Lists high-risk changes that need user confirmation |
 | `docs/Agent_Rules/handoff-packet.md` | Defines the continuity summary for task handoff |
+| `docs/Agent_Rules/lessons.md` | Records corrections, repeated mistakes, and prevention rules |
+| `docs/Agent_Rules/skill-candidates.md` | Tracks repeatable workflows that may become reusable skills |
 
 ## Agent behavior
 
@@ -30,6 +34,8 @@ It also installs `AGENTS.md` at the repository root.
 3. Use the verification matrix before reporting work as done.
 4. Stop at decision gates instead of silently applying high-risk changes.
 5. Use the handoff packet for medium or large work, blocked work, or session-close summaries.
+6. Update lessons when the user corrects the agent.
+7. Update skill candidates when a repeatable workflow emerges.
 
 ## Design rule
 

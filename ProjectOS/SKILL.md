@@ -43,15 +43,18 @@ Create a project operating system with two expandable layers:
 7. Choose the layer:
    - Use `--layer core` for the base repository contract, AGENTS file, wiki/docs structure, and work harness.
    - Use `--layer full` when the user also wants task lifecycle, subagent, reporting, risk, and sync rule pages.
-8. Run `scripts/bootstrap_projectos.py --root <PROJECT_ROOT> --project-name <NAME> --mode <init|adopt> --layer <core|full>` after the user confirms the scope. Add `--docs-root`, `--code-root`, `--agents-file`, or `--status-file` when the repository already has preferred names.
-9. If the user chooses Layer 2 / `--layer full`, also read:
+8. Choose the runtime:
+   - Use `--runtime none` for file-only NexusOS.
+   - Use `--runtime local` to install a lightweight reflection/check shim similar to Hermes memory nudges.
+9. Run `scripts/bootstrap_projectos.py --root <PROJECT_ROOT> --project-name <NAME> --mode <init|adopt> --layer <core|full> --runtime <none|local>` after the user confirms the scope. Add `--docs-root`, `--code-root`, `--agents-file`, or `--status-file` when the repository already has preferred names.
+10. If the user chooses Layer 2 / `--layer full`, also read:
    - `references/task-lifecycle.md`
    - `references/subagent-workflow.md`
    - `references/reporting-style.md`
    - `references/risk-exceptions.md`
    - `references/sync-checks.md`
-10. Customize the generated index, component pages, and rule pages for the target repository.
-11. Verify the result with `resources/checklist.md`.
+11. Customize the generated index, component pages, and rule pages for the target repository.
+12. Verify the result with `resources/checklist.md`.
 
 ## Capability map
 
@@ -61,6 +64,8 @@ Create a project operating system with two expandable layers:
 - Define project-specific paths and agent defaults: generated `nexusos.yaml`
 - Install first-read agent rules: generated `AGENTS.md`
 - Install work harness rules: generated `docs/Agent_Rules/`
+- Install lessons and skill-candidate memory files: generated `docs/Agent_Rules/lessons.md` and `docs/Agent_Rules/skill-candidates.md`
+- Install optional local runtime shim: `scripts/nexusos_runtime.py`, `scripts/check_nexusos.py`, `.nexusos/runtime/`, `.githooks/pre-commit`
 - Define node roles and relationships: `references/node-model.md`
 - Apply onboarding and selective-loading workflow: `references/bootstrap-flow.md`
 - Apply minimum context loading: `references/minimum-context-policy.md`
@@ -80,6 +85,7 @@ Create a project operating system with two expandable layers:
 - Do not apply Layer 2 rules automatically. Inspect first, then ask the user to choose whether Layer 2 is needed.
 - In adopt mode, preserve existing files. If the requested `AGENTS.md` already exists, generate `AGENTS.nexusos.md` and point `nexusos.yaml` to it.
 - After adopt mode, guide the user through agent-rule reconciliation, documentation entrypoint reconciliation, verification command confirmation, and component draft review before treating adoption as complete.
+- When the user corrects the agent, update `lessons.md`. When a repeatable workflow emerges, update `skill-candidates.md`.
 
 ## How to execute
 

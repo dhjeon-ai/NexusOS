@@ -31,6 +31,8 @@ Use `--layer core` for the base operating standard.
 
 Use `--layer full` when the user also wants task lifecycle, subagent workflow, reporting style, risk exception, and sync check pages.
 
+Use `--runtime local` when the user wants Hermes-like reflection prompts, a local NexusOS check command, runtime event logs, and a git hook template.
+
 ## Phase 1. Pick the root contract
 
 Create one root `nexusos.yaml` file and one root docs folder.
@@ -62,6 +64,9 @@ docs/
   04_Archive/
   Active_Tasks/
   Agent_Rules/
+scripts/                  # only with --runtime local
+.nexusos/runtime/          # only with --runtime local
+.githooks/                 # only with --runtime local
 ```
 
 Create one root session-status file outside the docs folder:
@@ -103,8 +108,16 @@ Create a small agent rule set:
 - verification matrix
 - decision gates
 - handoff packet
+- lessons
+- skill candidates
 
 These files define how agents decide work size, prove completion, stop for human decisions, and preserve continuity.
+
+Lessons and skill candidates create a file-based self-improvement loop:
+
+- corrections and repeated mistakes go to `lessons.md`
+- repeatable workflows go to `skill-candidates.md`
+- `nexusos_runtime.py reflect` nudges agents to update both before final reporting
 
 ## Phase 3c. Adopt existing structure
 
@@ -117,6 +130,7 @@ When using adopt mode:
 - create `AGENTS.nexusos.md` when `AGENTS.md` already exists
 - create `Task_NexusOS_Adoption.md` with created files, preserved files, and next actions
 - guide the next agent through agent-rule reconciliation, documentation entrypoint reconciliation, verification command confirmation, component draft review, and layer follow-up
+- when `--runtime local` is selected, install `scripts/nexusos_runtime.py`, `scripts/check_nexusos.py`, `.nexusos/runtime/`, and `.githooks/pre-commit`
 
 ## Phase 4. Define component contracts
 

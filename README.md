@@ -13,6 +13,8 @@ NexusOS installs or adopts a lightweight, node-based project structure built aro
 - one first-read agent rules file
 - selective context loading
 - task sizing, verification, decision, and handoff rules
+- lessons and skill-candidate memory files
+- optional local runtime reflection/check shim
 - stable architecture and component contracts
 - task continuity for medium and large work
 - optional operating-rule packs for long-lived projects
@@ -115,6 +117,8 @@ python ProjectOS/scripts/bootstrap_projectos.py --root /path/to/existing-repo --
 
 Use `--layer full` when the project also needs task lifecycle, subagent workflow, reporting style, risk exception, and sync check pages.
 
+Use `--runtime local` when you want Hermes-like reflection prompts, a NexusOS check script, runtime event logs, and a pre-commit hook template.
+
 This creates a starter operating structure such as:
 
 ```text
@@ -133,6 +137,15 @@ my-repo/
       verification-matrix.md
       decision-gates.md
       handoff-packet.md
+      lessons.md
+      skill-candidates.md
+  scripts/
+    nexusos_runtime.py        # only with --runtime local
+    check_nexusos.py          # only with --runtime local
+  .nexusos/
+    runtime/                  # only with --runtime local
+  .githooks/
+    pre-commit                # only with --runtime local
   project_work_status.md
 ```
 
@@ -171,6 +184,8 @@ The current version already supports:
 - root `AGENTS.md` agent operating guides
 - minimum-context loading rules
 - task sizing, verification matrix, decision gate, and handoff packet rules
+- lessons and skill-candidate files for repeated mistake prevention
+- optional local runtime shim with reflection and check commands
 - optional `--layer full` operating-rule pages
 - adoption reconciliation guidance for existing repositories
 - node-based documentation roles

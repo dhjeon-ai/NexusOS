@@ -28,10 +28,11 @@ python ProjectOS/scripts/bootstrap_projectos.py --root /path/to/new-repo --proje
 Existing repository:
 
 ```bash
-python ProjectOS/scripts/bootstrap_projectos.py --root /path/to/existing-repo --project-name "Project Name" --mode adopt --layer core
+python ProjectOS/scripts/bootstrap_projectos.py --root /path/to/existing-repo --project-name "Project Name" --mode adopt --layer core --runtime local
 ```
 
 Use `--layer full` when the user also wants task lifecycle, subagent workflow, reporting style, risk exception, and sync check pages.
+Use `--runtime local` when the user wants Hermes-like lessons, reflection prompts, NexusOS checks, and a git hook template.
 
 ## Agent Behavior
 
@@ -40,3 +41,4 @@ Use `--layer full` when the user also wants task lifecycle, subagent workflow, r
 3. Preserve existing files. Do not overwrite project-specific rules.
 4. After applying NexusOS, report created files, preserved files, detected structure, and remaining user decisions.
 5. In adopt mode, guide the user through agent-rule reconciliation, documentation entrypoint reconciliation, verification command confirmation, and component draft review.
+6. When the user corrects the agent, record the lesson in the generated `lessons.md`. If a repeatable workflow emerges, record it in `skill-candidates.md`.
