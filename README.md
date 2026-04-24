@@ -121,6 +121,12 @@ Use `--layer full` when the project also needs task lifecycle, subagent workflow
 Use `--runtime local` when you want Hermes-like reflection prompts, a NexusOS check script, runtime event logs, and a pre-commit hook template.
 The local runtime also installs `nexusos_audit.py`, `.nexusos/audit/`, and `.nexusos/quarantine/` for external rule and script review.
 
+Recommended full adoption command:
+
+```bash
+python ProjectOS/scripts/bootstrap_projectos.py --root /path/to/existing-repo --project-name "Existing Repo" --mode adopt --layer full --runtime local
+```
+
 This creates a starter operating structure such as:
 
 ```text
@@ -201,6 +207,7 @@ The current version already supports:
 
 ## Next direction
 
-- add layer-aware scaffold flags such as `--layer core` and `--layer full`
 - add starter packs for different repository types
+- add compatibility guides for Codex, Antigravity, Claude, and Copilot-style agents
+- add checkpoint and rollback support for large agent edits
 - publish install examples for both local and packaged distribution
